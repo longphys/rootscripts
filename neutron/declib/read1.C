@@ -21,12 +21,12 @@ void read1()
   auto timer = new TStopwatch();
   timer->Start();
 
-  // TFile* file = new TFile("./output/test06_2_Plast_BC404_14x_14y_out_test.root","open");
-  // TFile* file = new TFile("./output/test06_2_Plast_BC404_14x_14y_out_test1.root","open");
-  // TFile* file = new TFile("./output/test08_2_Plast_BC404_14x_14y_Pos_x0_y0_out.root","open");
-  // TFile* file = new TFile("./output/test09_2_Plast_BC404_14x_14y_Pos_x20_y-20_out.root","open");
-  TFile* file = new TFile("./output/test10_2_Plast_BC404_14x_14y_Pos_x0_y-92_out.root","open");
-  // TFile* file = new TFile("./output/test11_2_Plast_BC404_14x_14y_Pos_x0_y-92_wo_upper_detector-ch1_out.root","open");
+  // TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test06_2_Plast_BC404_14x_14y_out_test.root","open");
+  // TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test06_2_Plast_BC404_14x_14y_out_test1.root","open");
+  TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test08_2_Plast_BC404_14x_14y_Pos_x0_y0_out.root","open");
+  // TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test09_2_Plast_BC404_14x_14y_Pos_x20_y-20_out.root","open");
+  // TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test10_2_Plast_BC404_14x_14y_Pos_x0_y-92_out.root","open");
+  // TFile* file = new TFile("../../../EfficiencyPlasticFLNR/declib/output/test11_2_Plast_BC404_14x_14y_Pos_x0_y-92_wo_upper_detector-ch1_out.root","open");
   TTree* tree = (TTree*)file->Get("ETree");
 
   // TH1D* E[endingChannelNum-startingChannelNum+1];
