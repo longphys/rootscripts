@@ -56,8 +56,8 @@ std::vector <double> *deCs137 = nullptr;
 std::vector <double> *deNa22 = nullptr;
 
 //! CHANNEL CHANGE
-// int channel = 0;
-int channel = 1;
+int channel = 0;
+// int channel = 1;
 // int channel = 2;
 
 //! NUMBER OF ENTRIES FOR GRADIENT DESCENT
@@ -67,8 +67,8 @@ int entriesSim = 500000;
 // int entriesExp = 200000;
 // int entriesSim = 200000;
 //! FFT Threshold FOR GRADIENT DESCENT (30-1500)
-double threshExp = 40.;
-double threshSim = 50.;
+double threshExp = 1500.;
+double threshSim = 1500.;
 
 //! TUNING RATE FOR GRADIENT DESCENT
 //? To increase the speed of gradient descent, increase the tuning rate
@@ -188,7 +188,7 @@ TH1D* Diff(TH1D* hChannel, std::string TH1name, std::string TH1title, int bin, d
   double binLength = (xmax-xmin)/bin;
 
   TH1D* hDiff = new TH1D(TH1namechar, TH1titlechar, bin, xmin, xmax);
-  for(int i = 3; i <= binExp - 2; i++)
+  for(int i = 3; i <= bin - 2; i++)
   {
     newBinContent = (-hChannel->GetBinContent(i+2) 
     + 8*hChannel->GetBinContent(i+1) 

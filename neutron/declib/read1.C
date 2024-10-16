@@ -37,6 +37,7 @@ void read1()
   
   TCanvas* cn_pl0 = new TCanvas("cn_pl0", "cn_pl0", 800, 800);
   TCanvas* cn_pl1 = new TCanvas("cn_pl1", "cn_pl1", 800, 800);
+  TCanvas* cn_alphas = new TCanvas("cn_alphas", "cn_alphas", 800, 800);
 
   // TFile* fileSave = new TFile("./output/test06_2_Plast_BC404_14x_14y_result.root", "recreate");
   // // TFile* fileSave = new TFile("./output/test06_2_Plast_BC404_14x_14y_result_threshold.root", "recreate");
@@ -110,19 +111,25 @@ void read1()
   TH1D* h1 = new TH1D("h1", "h1", 10000, xmin, xmax);
   TH1D* h_cross = new TH1D("h_cross", "h_cross", 10000, xmin, xmax);
 
-  TH1D* h_time0 = new TH1D("h_time0", "h_time0", 1000, xminTime, xmaxTime);
-  TH1D* h_time1 = new TH1D("h_time1", "h_time1", 1000, xminTime, xmaxTime);
-  TH1D* h_timetest = new TH1D("h_timetest", "h_timetest", 1000, xminTime, xmaxTime);
+  // TH1D* h_time0 = new TH1D("h_time0", "h_time0", 1000, xminTime, xmaxTime);
+  // TH1D* h_time1 = new TH1D("h_time1", "h_time1", 1000, xminTime, xmaxTime);
+  // TH1D* h_timetest = new TH1D("h_timetest", "h_timetest", 1000, xminTime, xmaxTime);
 
   long int entries = tree->GetEntriesFast();
-  entries = (int)1.0e5;
+  entries = (int)1.0e6;
   //std::cout << "test loop:" << std::endl;
 
-  double threshold_plas_0 = 30.;
-  double threshold_plas_1 = 30.;
+  // double threshold_plas_0 = 30.;
+  // double threshold_plas_1 = 30.;
 
-  int beam_xc = 8;
-  int beam_yc = 9;
+  double threshold_plas_0 = 87.;
+  double threshold_plas_1 = 81.;
+
+  // double threshold_plas_0 = 300.;
+  // double threshold_plas_1 = 300.;
+
+  int beam_xc = 9;
+  int beam_yc = 8;
 
   int counttest = 0;
 
@@ -175,11 +182,11 @@ void read1()
         //! Signal on alpha and Plastic0
         if(de_data[0] > threshold_plas_0){
           //! vector 2 elements [x_channel, y_channel]
-          // xy_plst0.push_back(j);
+          xy_plst0.push_back(j);
         }
         //! Signal on alpha and Plastic1
         if(de_data[1] > threshold_plas_1){
-          // xy_plst1.push_back(j);
+          xy_plst1.push_back(j);
         }
       }
 
@@ -240,7 +247,7 @@ void read1()
     // }
 //! TESTING
 
-    if (xy_allalphas.size() == 2) //! should only happen if vector has 2 elements
+    if (xy_allalphas.size() == 2) //! ONLY SIGNAL IN ALPHA
     {
       int x_alpha = xy_allalphas.at(0); //! x[2-15]->x[1-14]
       int y_alpha = xy_allalphas.at(1); //! y[16-29]->y[1-14]
@@ -250,7 +257,7 @@ void read1()
         y_alpha -= 15;
         hmap_alpha->Fill(x_alpha, y_alpha);
 
-        if ((x_alpha == beam_xc)&& (y_alpha == beam_yc))
+        if ((x_alpha == beam_xc) && (y_alpha == beam_yc))
         {
           heff0->Fill(de_data[0]);
           heff1->Fill(de_data[1]);
@@ -258,7 +265,8 @@ void read1()
       }
     }
 
-    if (xy_plst0.size() == 2) //! should only happen if vector has 2 elements
+    //! PLASTIC 0
+    if (xy_plst0.size() == 2) //! SIGNAL IN ALPHA AND PLASTIC 0
     {
       int x = xy_plst0.at(0);
       int y = xy_plst0.at(1);
@@ -270,12 +278,12 @@ void read1()
       {
         x -= 1;
         y -= 15;
-        // hmap->Fill(x, y);
+        hmap->Fill(x, y);
 
         if ((x == beam_xc)&& (y == beam_yc))
         {
-          // h0->Fill(de_data[0]);
-          // h1->Fill(de_data[1]);
+          h0->Fill(de_data[0]);
+          h1->Fill(de_data[1]);
 
           // if (de_data[1] < threshold_plas_1)
           // {
@@ -290,7 +298,8 @@ void read1()
       }
     }
 
-    if (xy_plst1.size() == 2) //! should only happen if vector has 2 elements
+    //! PLASTIC 1
+    if (xy_plst1.size() == 2) //! SIGNAL IN ALPHA AND PLASTIC 1
     {
       int x1 = xy_plst1.at(0);
       int y1 = xy_plst1.at(1);
@@ -298,31 +307,34 @@ void read1()
       {
         x1-= 1;
         y1 -= 15;
-        // hmap1->Fill(x1, y1);
+        hmap1->Fill(x1, y1);
         if ((x1 == beam_xc)&& (y1 == beam_yc))
         {
           // h0->Fill(de_data[0]);
           // h1->Fill(de_data[1]);
 
-          // if (de_data[0] < threshold_plas_0)
-          // {
-          //   h_cross->Fill(de_data[1]);
-          // }
+          //! If undetected in PLASTIC 0 but detected in PLASTIC 1 = PLASTIC 0'S CROSSTALK
+          if (de_data[0] < threshold_plas_0)
+          {
+            h_cross->Fill(de_data[1]);
+          }
         }
       }
     }
   }
   cn_pl0->cd();
-  // hmap->Draw("COLZ");
+  hmap->Draw("COLZ");
+
+  cn_alphas->cd();
   hmap_alpha->Draw("COLZ");
   double n_alpha = hmap_alpha->GetBinContent(beam_xc+1, beam_yc+1);
   
   cn_pl1->cd();
   hmap1->Draw("COLZ");
 
-  // TCanvas* cn_cross = new TCanvas("cn_cross", "cn_cross", 700, 700);
-  // cn_cross->cd();
-  // h_cross->Draw();
+  TCanvas* cn_cross = new TCanvas("cn_cross", "cn_cross", 700, 700);
+  cn_cross->cd();
+  h_cross->Draw();
 
   // TCanvas* ctime = new TCanvas("ctime", "ctime", 800, 800);
   // ctime->Divide(3,1);
@@ -338,26 +350,32 @@ void read1()
   // heff0->Draw();
   // heff0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
   // double n_0 = heff0->Integral(threshold_plas_0, xmax);
-
-  // std::cout << "n_0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_0 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
-  // std::cout << "Efficiency_0 = " << (n_0/n_alpha)*100 << "%\n";
-
   h0->Draw();
   h0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
+  double n_0 = h0->Integral(threshold_plas_0, xmax);
+
+  std::cout << "n_0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_0 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
+  std::cout << "Efficiency_0 = " << (n_0/n_alpha)*100 << "%\n";
+
+  // h0->Draw();
+  // h0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
   c->cd(1)->Update();
 
   // TPaveStats *st_eff0 = (TPaveStats*)heff0->FindObject("stats");
   // st_eff0->SetOptStat(1111111);
-  // TPaveStats *st0 = (TPaveStats*)h0->FindObject("stats");
-  // st0->SetOptStat(1111111);
+  TPaveStats *st0 = (TPaveStats*)h0->FindObject("stats");
+  st0->SetOptStat(1111111);
   c->cd(1)->Modified();
 
   c->cd(2);
   c->cd(2)->SetLogy();
 
-  heff1->Draw();
-  heff1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
-  double n_1 = heff1->Integral(threshold_plas_1, xmax);
+  // heff1->Draw();
+  // heff1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
+  // double n_1 = heff1->Integral(threshold_plas_1, xmax);
+  h1->Draw();
+  h1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
+  double n_1 = h1->Integral(threshold_plas_1, xmax);
 
   std::cout << "n_1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_1 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
   std::cout << "Efficiency_1 = " << (n_1/n_alpha)*100 << "%\n";
@@ -366,13 +384,13 @@ void read1()
   // h1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
   c->cd(2)->Update();
 
-  TPaveStats *st_eff1 = (TPaveStats*)heff1->FindObject("stats");
-  st_eff1->SetOptStat(1111111);
-  // TPaveStats *st1 = (TPaveStats*)h1->FindObject("stats");
-  // st1->SetOptStat(1111111);
+  // TPaveStats *st_eff1 = (TPaveStats*)heff1->FindObject("stats");
+  // st_eff1->SetOptStat(1111111);
+  TPaveStats *st1 = (TPaveStats*)h1->FindObject("stats");
+  st1->SetOptStat(1111111);
   c->cd(2)->Modified();
 
-  std::cout << "counttest = " << counttest << " = " << (double)(counttest*100)/entries << "% of " << entries << " entries.\n";
+  // std::cout << "counttest = " << counttest << " = " << (double)(counttest*100)/entries << "% of " << entries << " entries.\n";
 
   std::cout << "\ntime: " << timer->RealTime() << " (s)\n";
 }

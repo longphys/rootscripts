@@ -4,33 +4,159 @@
 #include "TTree.h"
 #include "TCanvas.h"
 #include "TH1.h"
+#include "TH2.h"
 #include "TF1.h"
 #include "TLegend.h"
 #include "TRandom3.h"
+#include "TVirtualFFT.h"
 #include "TStopwatch.h"
+#include "TCutG.h"
 
 //! histogram options
 double xminSim = 0.;
 double xmaxSim = 20.;
-double xminExp = 0;
+double xminExp = 0.;
 double xmaxExp = 20000;
 
 int binSim = (xmaxSim-xminSim)*1000.;
 int binExp = xmaxExp-xminExp;
+int binExpFactor = 10;
 
 double ECs137 = 0.477;
 double ENa22 = 1.061;
 double ECo60 = 1.117;
 
 //! ch0_9751_ch1_9800_ch2_9421
-int ChCs137[2] = {388, 283};
-int ChNa22[2] = {885, 642};
+int ChCs137[2] = {365, 283};
+int ChNa22[2] = {860, 642};
+// int ChCs137[2] = {385, 283};
+// int ChNa22[2] = {862, 642};
 
-double deltaSigCs137[2] = {7.6, 7.6};
-double deltaSigNa22[2] = {5.5, 5.5};
+double deltaSigCs137[2] = {7.7, 7.6};
+double deltaSigNa22[2] = {5.1, 5.5};
 
 //! Channels
 int channel[2] = {0, 1};
+
+//! Derivative
+const char* TH1namechar;
+const char* TH1titlechar;
+int threshold(TH1D* hChannel, std::string TH1name, std::string TH1title, int bin, double xmin, double xmax)
+{
+  TH1D* Diff = new TH1D();
+  TH1namechar = TH1name.c_str();
+  TH1titlechar = TH1title.c_str();
+  double binLength = (xmax-xmin)/bin;
+  double zeroBinValue = 100000.;
+  int zeroBin;
+  double maxBinValue = 0.;
+  int maxBin;
+
+  TH1D* hDiff = new TH1D(TH1namechar, TH1titlechar, bin, xmin, xmax);
+  for(int i = 3; i <= bin - 2; i++)
+  {
+    double newBinContent = 1000000*(-hChannel->GetBinContent(i+2) 
+    + 8*hChannel->GetBinContent(i+1) 
+    - 8*hChannel->GetBinContent(i-1) 
+    + hChannel->GetBinContent(i-2))/12*binLength;
+    hDiff->SetBinContent(i, newBinContent);
+    if (abs(newBinContent) < zeroBinValue && abs(newBinContent) > 0.){
+      zeroBin = i;
+      zeroBinValue = abs(newBinContent);
+      std::cout << "binContent["<< i << "] = " << newBinContent << "\n";
+    }
+  }
+
+  delete Diff;
+  return zeroBin;
+}
+
+//! FFT
+TH1D* fft(TH1D* hChannel, double para_k, double para_c, std::string TH1name, std::string TH1title, int bin, double xmin, double xmax)
+{
+  int binEven = 2*bin;
+  TH1namechar = TH1name.c_str();
+  TH1titlechar = TH1title.c_str();
+
+  TH1D* hFiltered = new TH1D(TH1namechar, TH1titlechar, bin, xmin, xmax);
+  TH1D* hEvenChannel = new TH1D("hEvenChannel", "Transformed to even function", binEven, -(xmax - xmin), xmax - xmin);
+
+  for(int i = 1; i <= binEven/2; i++)
+  {
+    hEvenChannel->SetBinContent(i, hChannel->GetBinContent(i));
+    hEvenChannel->SetBinContent(binEven - i, hChannel->GetBinContent(i));
+  }
+  hEvenChannel->SetBinContent(binExp, hEvenChannel->GetBinContent(binExp + 1));
+
+  TF1* fLogis = new TF1("fLogis", "1./(1.+exp([0]*(x-[1])))", 0, binEven);
+  fLogis->SetParameter(0, para_k);
+  fLogis->SetParameter(1, para_c);
+  fLogis->SetNpx(10000);
+
+  //! Magnitude
+  TH1 *hm = nullptr;
+  TVirtualFFT::SetTransform(nullptr);
+  hm = hEvenChannel->FFT(hm, "MAG");
+  
+  TH1D* newhm = new TH1D("newhm", "newhm", binEven, -(xmax - xmin), xmax - xmin);
+  for(int i = 1; i <= binEven; i++)
+  {
+    newhm->SetBinContent(i, hm->GetBinContent(i)/binEven);
+  }
+
+  TH1D* hLogis = new TH1D("hLogis", "Logis", binEven, 0, binEven);
+  for(int i = 1; i <= binEven/2; i++)
+  {
+    hLogis->SetBinContent(i, fLogis->Eval(i));
+    hLogis->SetBinContent(binEven-i, fLogis->Eval(i));
+  }
+
+  hLogis->SetLineColor(kRed);
+  hLogis->Draw("same");
+
+  //! Apply threshold
+  TVirtualFFT *fft = TVirtualFFT::GetCurrentTransform();
+  Double_t *re_full = new Double_t[binEven];
+  Double_t *im_full = new Double_t[binEven];
+ 
+  fft->GetPointsComplex(re_full, im_full);
+
+  for(int i = 1; i <= binEven; i++)
+  {
+    re_full[i] = re_full[i]*hLogis->GetBinContent(i);
+    im_full[i] = im_full[i]*hLogis->GetBinContent(i);
+  }
+
+  TVirtualFFT *fft_back = TVirtualFFT::FFT(1, &binEven, "C2R M K");
+  fft_back->SetPointsComplex(re_full,im_full);
+  fft_back->Transform();
+  TH1 *hb = nullptr;
+  hb = TH1::TransformHisto(fft_back,hb,"RE");
+
+  TH1D* newhb = new TH1D("newhb", "newhb", binEven, -(xmax - xmin), xmax - xmin);
+  for(int i = 1; i <= binEven; i++)
+  {
+    newhb->SetBinContent(i, hb->GetBinContent(i)/binEven);
+  }
+
+  for(int i = 1; i <= bin; i++)
+  {
+    hFiltered->SetBinContent(i, newhb->GetBinContent(i));
+  }
+
+  delete hEvenChannel;
+  delete hm;
+  delete newhm;
+  delete fLogis;
+  delete hLogis;
+  delete[] re_full;
+  delete[] im_full;
+  delete fft_back;
+  delete hb;
+  delete newhb;
+
+  return hFiltered;
+}
 
 void readNeutron()
 {
@@ -39,31 +165,64 @@ void readNeutron()
 
   std::vector <double> *EDep = nullptr;
   std::vector <double> *Time = nullptr;
+  std::vector <double> *EDepBackground = nullptr;
 
   //! Files and trees
   TFile* fexp = new TFile("../../EfficiencyPlasticFLNR/declib/output/test08_2_Plast_BC404_14x_14y_Pos_x0_y0_out.root", "read");
   // TFile* fexp = new TFile("../../EfficiencyPlasticFLNR/declib/output/test09_2_Plast_BC404_14x_14y_Pos_x20_y-20_out.root", "read");
   // TFile* fexp = new TFile("../../EfficiencyPlasticFLNR/declib/output/test10_2_Plast_BC404_14x_14y_Pos_x0_y-92_out.root", "read");
   // TFile* fexp = new TFile("../../EfficiencyPlasticFLNR/declib/output/test11_2_Plast_BC404_14x_14y_Pos_x0_y-92_wo_upper_detector-ch1_out.root", "read");
+
+  TFile* fbackground = new TFile("../../EfficiencyPlasticFLNR/declib/output/cal_test04_2_Plast_BC404_Bskgr.root", "read");
+  // TFile* fbackground = new TFile("../../EfficiencyPlasticFLNR/declib/output/test14_2_Plast_BC404_Background.root", "read");
+
   TTree* texp =  (TTree*) fexp->Get("ETree");
+  TTree* tbackground =  (TTree*) fbackground->Get("ETree");
   
-  TFile* fsim = new TFile("../../simfiles/neutron/prem_088.root", "read");
+  // TFile* fsim = new TFile("../../simfiles/neutron/eff_1.45_birk_207.root", "read");
+  // TFile* fsim = new TFile("../../simfiles/neutron/eff_0.95_birk_088.root", "read");
+  // TFile* fsim = new TFile("../../simfiles/neutron/eff_0.8_birk_0486.root", "read");
+  // TFile* fsim = new TFile("../../../software/geant4/geant4build/sim/build/collimated.root", "read");
+  TFile* fsim = new TFile("../../../software/geant4/geant4build/sim/build/collimated_shield.root", "read");
+  // TFile* fsim = new TFile("../../../software/geant4/geant4build/sim/build/out.root", "read");
   TTree* tsim =  (TTree*) fsim->Get("dEEtree");
 
   double a[2], b[2], xminCal[2], xmaxCal[2], coA[2], coB[2], coC[2];
 
   //! Measurement histogram
+  TH1D* hcal_original[2];
   TH1D* hcal[2];
+  TH2D* htime[2];
   char* nameCal = new char[20];
 
   texp->SetBranchAddress("EDep", &EDep);
   texp->SetBranchAddress("Time", &Time);
+
+  TH1D* hbackground[2];
+  char* nameCalBackground = new char[20];
+  tbackground->SetBranchAddress("EDep", &EDepBackground);
   
   Long64_t entries_exp = texp->GetEntries();
+  // entries_exp = 10000000;
+  // entries_exp = 10000000*1.5;
+  entries_exp = 1000000;
   // std::cout << "Number of entries (exp): " << entries_exp << "\n";
 
+  TCutG *cutg = new TCutG("mycut", 0);
+  cutg->SetVarX("y");
+  cutg->SetVarY("x");
+
+  cutg->SetPoint(0, 0.0, 2.4);
+  cutg->SetPoint(1, 2.0, 2.2);
+  cutg->SetPoint(2, 5.0, 2.4);
+  cutg->SetPoint(2, 10.0, 2.4);
+  cutg->SetPoint(3, 10.0, 0.0);
+  cutg->SetPoint(4, 2.0, 0.0);
+  cutg->SetPoint(5, 0.0, -0.5);
+  cutg->SetPoint(6, 0.0, 2.4);
+
   TCanvas* cFit = new TCanvas("cFit", "Linear calibration", 800, 600);
-  for(int i = 0; i < 2; i++){
+  for(int i = 0; i < 1; i++){
     TH1D* hCali = new TH1D("hCali", "Calibration fit", binExp, xminExp, xmaxExp);
     hCali->SetBinContent(ChCs137[i] - xminExp, ECs137);
     hCali->SetBinContent(ChNa22[i] - xminExp, ENa22);
@@ -83,18 +242,94 @@ void readNeutron()
 
     sprintf(nameCal,"channel%d",i); 
 
-    hcal[i] = new TH1D(nameCal, nameCal, binExp/10, xminCal[i], xmaxCal[i]);
+    hcal_original[i] = new TH1D(nameCal, nameCal, binExp/binExpFactor, xminCal[i], xmaxCal[i]);
+    hcal_original[i]->GetXaxis()->SetTitle("Energy(MeV)");
+    hcal_original[i]->GetYaxis()->SetTitle("Count");
+
+    hcal[i] = new TH1D(nameCal, nameCal, binExp/binExpFactor, xminCal[i], xmaxCal[i]);
     hcal[i]->GetXaxis()->SetTitle("Energy(MeV)");
     hcal[i]->GetYaxis()->SetTitle("Count");
 
-    // for(int k = 0; k < entries_exp; k++){
-    for(int k = 0; k < 5000000; k++){
-      // if(k%1000000==0){std::cout << "entry: " << k << "\n";}
+    htime[i] = new TH2D("htime", "htime", binExp/binExpFactor/10, xminCal[i], xmaxCal[i], 5000, 0, 5);
+
+    int beam_xc = 8;
+    int beam_yc = 8;
+
+    for(int k = 0; k < entries_exp; k++){
+    // for(int k = 0; k < 10000000; k++){
+      if(k%100000==0){std::cout << "entry: " << k << "\n";}
       texp->GetEntry(k);
       int EDep_size = EDep->size();
       double* EDep_data = EDep->data();
-      hcal[i]->Fill(a[i]*(EDep_data[channel[i]]+0.5) + b[i]);
+      int Time_size = EDep->size();
+      double* Time_data = Time->data();
+
+      std::vector <int> xy_allalphas;
+      std::vector <int> xy_plst0;
+      std::vector <int> xy_plst1;
+      for(int j = 2; j < EDep_size; j++){
+        if (EDep_data[j] > 1 ) //! Signal on alpha
+        {
+          xy_allalphas.push_back(j);
+          //! Signal on alpha and Plastic0
+          xy_plst0.push_back(j);
+          //! Signal on alpha and Plastic1
+          xy_plst1.push_back(j);
+        }
+      }
+
+      if (xy_plst0.size() == 2) //! SIGNAL IN ALPHA AND PLASTIC 0
+      {
+        int x = xy_plst0.at(0);
+        int y = xy_plst0.at(1);
+
+        if (x < 16 && y > 15)
+        {
+          x -= 1;
+          y -= 15;
+
+          // if ((x == beam_xc) && (y == beam_yc))
+          if ((x >= beam_xc-2) && (x <= beam_xc+2) && (y >= beam_yc-2) && (y <= beam_yc+2))
+          {
+            double energy = a[i]*(EDep_data[channel[i]]+0.05) + b[i];
+            double timediff = Time_data[x+1]-Time_data[y+15];
+            hcal_original[i]->Fill(energy);
+            htime[i]->Fill(energy, timediff);
+            // if (cutg->IsInside(energy, timediff)){ //! if (x = energy, y = timediff is inside cutg) return 1
+            // if (timediff > 2.5 && timediff < 3.3){
+            // if (timediff > 1.8 && timediff < 2.5){
+            if (timediff > 1.8 && timediff < 3.3){
+              hcal[i]->Fill(energy);
+            }
+          }
+        }
+      }
+      
+      // for(int k = 2; k < 30; k++){
+      //   double timediff = Time_data[i]-Time_data[k];
+      //   double energy = a[i]*(EDep_data[channel[i]]+0.05) + b[i];
+      //   if (timediff != 0){
+      //     hcal_original[i]->Fill(energy);
+      //     htime[i]->Fill(energy, timediff);
+      //     if (cutg->IsInside(energy, timediff)){ //! if (x = energy, y = timediff is inside cutg) return 1
+      //       hcal[i]->Fill(energy);
+      //     }
+      //     break;
+      //   }
+      // }
     }
+
+    // sprintf(nameCalBackground,"backgroundChannel%d",i); 
+    // hbackground[i] = new TH1D(nameCalBackground, nameCalBackground, binExp/binExpFactor, xminCal[i], xmaxCal[i]);
+    // hbackground[i]->GetXaxis()->SetTitle("Energy(MeV)");
+    // hbackground[i]->GetYaxis()->SetTitle("Count");
+    // for(int k = 0; k < entries_exp; k++){
+    // // for(int k = 0; k < 10000000; k++){
+    //   tbackground->GetEntry(k);
+    //   int EDepBackground_size = EDepBackground->size();
+    //   double* EDepBackground_data = EDepBackground->data();
+    //   hbackground[i]->Fill(a[i]*(EDepBackground_data[channel[i]]+0.5) + b[i]);
+    // }
 
     std::cout << "bin Cs137: " << hcal[i]->FindBin(ECs137) << "\n";
     std::cout << "bin Na22: " << hcal[i]->FindBin(ENa22) << "\n";
@@ -122,7 +357,10 @@ void readNeutron()
   }
 
   //! Simulation histograms
-  TH1D* hsim = new TH1D("hsim", "Simulation", binExp/10, xminCal[0], xmaxCal[0]);
+  TH1D* hsim[2];
+  hsim[0] = new TH1D("hsim", "Simulation", binExp/binExpFactor, xminCal[0], xmaxCal[0]);
+  // hsim[1] = new TH1D("hsim2", "Simulation", binExp/binExpFactor, xminCal[1], xmaxCal[1]);
+
   std::vector <double> *neutronE = nullptr;
   std::vector <double> *protonE = nullptr;
   std::vector <double> *gammaE = nullptr;
@@ -139,13 +377,20 @@ void readNeutron()
 
   TRandom3* ranGen = new TRandom3();
 
-  coA[0] = 0.05;
-  coC[0] = 0.002;
+  int channel_sim = 0;
 
-  std::cout << "coA = " << coA[0] << "; coB = " << coB[0] << "; coC = " << coC[0] << "\n";
+  // coA[channel_sim] = 0.03;
+  // coB[channel_sim] = 0.1;
+  // coC[channel_sim] = 0.002;
 
+  // coA[channel_sim] = 0.0001;
+  // coB[channel_sim] = 0.04;
+  // coC[channel_sim] = 0.004;
+
+  std::cout << "coA = " << coA[channel_sim] << "; coB = " << coB[channel_sim] << "; coC = " << coC[channel_sim] << "\n";
 
   unsigned int entries_sim = tsim->GetEntriesFast();
+  entries_sim = 1;
   for (int i = 0; i < entries_sim; i++){
     tsim->GetEntry(i);
 
@@ -163,32 +408,52 @@ void readNeutron()
     double* c12E_data = c12E->data();
     double* otherE_data = otherE->data();
 
-    double sigma_neutron = neutronE_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(neutronE_data[0]),2) + pow(coC[0]/neutronE_data[0],2) );
-    double sigma_proton = protonE_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(protonE_data[0]),2) + pow(coC[0]/protonE_data[0],2) );
-    double sigma_gamma = gammaE_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(gammaE_data[0]),2) + pow(coC[0]/gammaE_data[0],2) );
-    double sigma_alpha = alphaE_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(alphaE_data[0]),2) + pow(coC[0]/alphaE_data[0],2) );
-    double sigma_c12 = c12E_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(c12E_data[0]),2) + pow(coC[0]/c12E_data[0],2) );
-    double sigma_other = otherE_data[0]*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(otherE_data[0]),2) + pow(coC[0]/otherE_data[0],2) );
+    // double neutron_sigma = neutronE_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(neutronE_data[channel_sim]),2) + pow(coC[channel_sim]/neutronE_data[channel_sim],2) );
+    // double proton_sigma = protonE_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(protonE_data[channel_sim]),2) + pow(coC[channel_sim]/protonE_data[channel_sim],2) );
+    // double gamma_sigma = gammaE_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(gammaE_data[channel_sim]),2) + pow(coC[channel_sim]/gammaE_data[channel_sim],2) );
+    // double alpha_sigma = alphaE_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(alphaE_data[channel_sim]),2) + pow(coC[channel_sim]/alphaE_data[channel_sim],2) );
+    // double c12_sigma = c12E_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(c12E_data[channel_sim]),2) + pow(coC[channel_sim]/c12E_data[channel_sim],2) );
+    // double sigma_other = otherE_data[channel_sim]*sqrt( pow(coA[channel_sim],2) + 
+    // pow(coB[channel_sim]/sqrt(otherE_data[channel_sim]),2) + pow(coC[channel_sim]/otherE_data[channel_sim],2) );
 
-    double energy_neutron = ranGen->Gaus(neutronE_data[0], sigma_neutron);
-    double energy_proton = ranGen->Gaus(protonE_data[0], sigma_proton);
-    double energy_gamma = ranGen->Gaus(gammaE_data[0], sigma_gamma);
-    double energy_alpha = ranGen->Gaus(alphaE_data[0], sigma_alpha);
-    double energy_c12 = ranGen->Gaus(c12E_data[0], sigma_c12);
-    double energy_other = ranGen->Gaus(otherE_data[0], sigma_other);
+    // double neutron_energy = ranGen->Gaus(neutronE_data[channel_sim], neutron_sigma);
+    // double proton_energy = ranGen->Gaus(protonE_data[channel_sim], proton_sigma);
+    // double gamma_energy = ranGen->Gaus(gammaE_data[channel_sim], gamma_sigma);
+    // double alpha_energy = ranGen->Gaus(alphaE_data[channel_sim], alpha_sigma);
+    // double c12_energy = ranGen->Gaus(c12E_data[channel_sim], c12_sigma);
+    // double other_energy = ranGen->Gaus(otherE_data[channel_sim], sigma_other);
 
-    double energy_abs = neutronE_data[0]+protonE_data[0]+gammaE_data[0]+alphaE_data[0]+c12E_data[0]+otherE_data[0];
-    double sigma = energy_abs*sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(energy_abs),2) + pow(coC[0]/energy_abs,2) );
-    double energy_res = ranGen->Gaus(energy_abs, sigma);
+    double energy_abs = neutronE_data[channel_sim]+protonE_data[channel_sim]+gammaE_data[channel_sim]+
+    alphaE_data[channel_sim]+c12E_data[channel_sim]+otherE_data[channel_sim];
+    if (energy_abs > 0.01){
+      double sigma = energy_abs*sqrt( pow(coA[channel_sim],2) + pow(coB[channel_sim]/sqrt(energy_abs),2) + 
+      pow(coC[channel_sim]/energy_abs,2) );
+      double energy_res = ranGen->Gaus(energy_abs, sigma);
 
-    // if(i%100000 == 0){
-    //   std::cout << "\nEntry: " << i << "\n";
-    //   std::cout << "energy_abs = " << energy_abs << "\n";
-    //   std::cout << "sigma = " << sigma << "\n";
-    //   std::cout << "energy_res = " << energy_res << "\n";
-    // }
-    // hsim->Fill(energy_abs);
-    hsim->Fill(energy_res);
+      double energy_abs2 = protonE_data[channel_sim];
+      double sigma2 = energy_abs2*sqrt( pow(coA[channel_sim],2) + pow(coB[channel_sim]/sqrt(energy_abs2),2) + 
+      pow(coC[channel_sim]/energy_abs2,2) );
+      double energy_res2 = ranGen->Gaus(energy_abs2, sigma2);
+
+      double energy_abs3 = neutronE_data[channel_sim] + protonE_data[channel_sim];
+      double sigma3 = energy_abs3*sqrt( pow(coA[channel_sim],2) + pow(coB[channel_sim]/sqrt(energy_abs3),2) + 
+      pow(coC[channel_sim]/energy_abs3,2) );
+      double energy_res3 = ranGen->Gaus(energy_abs3, sigma3);
+      // if(i == entries_sim){
+      //   // std::cout << "\nEntry: " << i << "\n";
+      //   std::cout << "energy_abs = " << energy_abs << "\n";
+      //   std::cout << "sigma = " << sigma << "\n";
+      //   std::cout << "energy_res = " << energy_res << "\n";
+      // }
+      hsim[channel_sim]->Fill(energy_res3);
+      // hsim[1]->Fill(energy_res3);
+    }
+
   }
   //! Canvas and draw
   TCanvas *c1 = new TCanvas("c1", "c1", 1600, 800);
@@ -196,37 +461,109 @@ void readNeutron()
   c1->Divide(2, 1);
 
   hcal[0]->SetLineColor(kRed);
-  hcal[1]->SetLineColor(kBlue);
+  // hcal[1]->SetLineColor(kRed);
   
   TLegend *leg1 = new TLegend(0.75, 0.6, 0.98, 0.75);
   leg1->SetHeader("test", "C");
   leg1->SetBorderSize(2);
 
-  for(int i = 0; i<2; i++){
-    c1->cd(i+1);
-    hcal[i]->Draw();
-    sprintf(nameCal,"Channel %d",i);
-    leg1->AddEntry(hcal[i], nameCal, "l");
-  }
+  c1->cd(1);
+  hcal[0]->Draw();
+  leg1->AddEntry(hcal[0], "plastic 0", "l");
+
+  c1->cd(2);
+  // hcal[1]->Draw();
+  // leg1->AddEntry(hcal[1], "plastic 1", "l");
+
   leg1->Draw();
+
+  // c1->cd(3);
+  // c1->cd(3)->SetLogy();
+  // hbackground[1]->Draw();
 
   TCanvas *c2 = new TCanvas("c2", "c2", 1600, 800);
   c2->cd();
   // c2->Divide(2,1);
+  // c2->SetLogy();
 
   TLegend *leg2 = new TLegend(0.75, 0.6, 0.98, 0.75);
   leg2->SetHeader("test", "C");
   leg2->SetBorderSize(2);
 
   // c2->cd(1);
-  hcal[0]->Draw();
+  // hcal[channel_sim]->Add(hbackground[channel_sim],-1.);
+  double scale_measurement = 1.5;
+  // hcal[channel_sim]->Scale(scale_measurement, "noSW2");
+  hcal[channel_sim]->Draw();
   // c2->cd(2);
-  hsim->SetLineColor(kBlue);
-  hsim->Draw("same");
-  leg2->AddEntry(hcal[0], "measurement", "l");
-  leg2->AddEntry(hsim, "simulation", "l");
+  hsim[channel_sim]->SetLineColor(kBlack);
+  hsim[channel_sim]->Draw("same");
+  // hsim[1]->Draw("same");
+
+  // hcal[channel_sim]->Add(hbackground[channel_sim],-1.);
+  // hcal_original[channel_sim]->Scale(scale_measurement, "noSW2");
+  hcal_original[channel_sim]->Draw("same");
+  leg2->AddEntry(hcal_original[channel_sim], "measurement", "l");
+  leg2->AddEntry(hcal[channel_sim], "measurement w cut on timediff", "l");
+  leg2->AddEntry(hsim[channel_sim], "simulation only proton w res", "l");
+  // leg2->AddEntry(hsim2, "simulation only proton w res", "l");
 
   leg2->Draw();
+
+  //! Chi2
+  double xmin_chi2 = 1.0;
+  double xmax_chi2 = 10.0;
+  hcal_original[channel_sim]->GetXaxis()->SetRangeUser(xmin_chi2, xmax_chi2);
+  hcal[channel_sim]->GetXaxis()->SetRangeUser(xmin_chi2, xmax_chi2);
+  hsim[channel_sim]->GetXaxis()->SetRangeUser(xmin_chi2, xmax_chi2);
+  hcal[channel_sim]->GetYaxis()->SetRangeUser(0., 2000.0);
+  hsim[channel_sim]->GetYaxis()->SetRangeUser(0., 2000.0);
+  double chi2 = hcal[channel_sim]->Chi2Test(hsim[channel_sim], "CHI2/NDF");
+  std::cout << "Chi2 from " << xmin_chi2 << " to " << xmax_chi2 << " (MeV) = " << chi2 << "\n";
+
+  // hcal[channel_sim]->GetXaxis()->UnZoom();
+  // hsim[channel_sim]->GetXaxis()->UnZoom();
+  // hcal[channel_sim]->GetYaxis()->UnZoom();
+  // hsim[channel_sim]->GetYaxis()->UnZoom();
+
+  //! Get thresholds
+  // TCanvas* ctest = new TCanvas("ctest", "ctest", 800, 600);
+  // ctest->Divide(2,1);
+
+  // TH1D* hcal_filtered[2];
+  // double threshmin = 0.1;
+  // double threshmax = 0.3;
+  // for (int i = 0; i < 2; i++){
+  //   hcal_filtered[i] = fft(hcal[i], 0.1, hcal[i]->GetNbinsX()/1, hcal[i]->GetTitle(), hcal[i]->GetTitle(), hcal[i]->GetNbinsX(), xminCal[i], xmaxCal[i]);
+  //   hcal_filtered[i]->GetXaxis()->SetRangeUser(threshmin, threshmax);
+  //   ctest->cd(i+1);
+  //   hcal_filtered[i]->Draw("same");
+  //   int firstbin = hcal_filtered[i]->FindBin(threshmin);
+  //   std::cout << "firstbin[" << i << "] = " << firstbin << "\n";
+  //   int lastbin = hcal_filtered[i]->FindBin(threshmax);
+  //   std::cout << "lastbin[" << i << "] = " << lastbin << "\n";
+  //   int numbin = lastbin-firstbin;
+  //   int thresholdToFindBin = threshold(hcal_filtered[i], hcal_filtered[i]->GetTitle(), hcal_filtered[i]->GetTitle(), numbin, threshmin, threshmax) + firstbin;
+  //   std::cout << "threshold[" << i << "] = " << thresholdToFindBin << "\n";
+
+  //   hcal_filtered[i]->GetXaxis()->UnZoom();
+  // }
+
+  double energy0 = 0.15;
+  // double energy1 = 0.15;
+  double threshold0 = (energy0-b[0])/a[0];
+  // double threshold1 = (energy1-b[1])/a[1];
+
+  std::cout << "threshold[0] = " << threshold0 << "\n";
+  // std::cout << "threshold[1] = " << threshold1 << "\n";
+
+  TCanvas *c3 = new TCanvas("c3", "c3", 1600, 800);
+  c3->Divide(2,1);
+  c3->cd(1);
+  htime[0]->Draw("col z");
+  c3->cd(2);
+  c3->cd(2)->SetTitle("htime with cut");
+  htime[0]->Draw("col z, [mycut]");
 
   std::cout << "\ntime: " << timer->RealTime() << " seconds\n";
 }
