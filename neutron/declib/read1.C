@@ -109,14 +109,15 @@ void read1()
 
   TH1D* h0 = new TH1D("h0", "h0", 10000, xmin, xmax);
   TH1D* h1 = new TH1D("h1", "h1", 10000, xmin, xmax);
-  TH1D* h_cross = new TH1D("h_cross", "h_cross", 10000, xmin, xmax);
+  TH1D* h_cross0 = new TH1D("h_cross0", "h_cross0", 10000, xmin, xmax);
+  TH1D* h_cross1 = new TH1D("h_cross1", "h_cross1", 10000, xmin, xmax);
 
   // TH1D* h_time0 = new TH1D("h_time0", "h_time0", 1000, xminTime, xmaxTime);
   // TH1D* h_time1 = new TH1D("h_time1", "h_time1", 1000, xminTime, xmaxTime);
   // TH1D* h_timetest = new TH1D("h_timetest", "h_timetest", 1000, xminTime, xmaxTime);
 
   long int entries = tree->GetEntriesFast();
-  entries = (int)1.0e6;
+  entries = (int)1.0e7;
   //std::cout << "test loop:" << std::endl;
 
   // double threshold_plas_0 = 30.;
@@ -247,7 +248,7 @@ void read1()
     // }
 //! TESTING
 
-    if (xy_allalphas.size() == 2) //! ONLY SIGNAL IN ALPHA
+    if (xy_allalphas.size() == 2) //! ONLY SIGNAL IN SILICON
     {
       int x_alpha = xy_allalphas.at(0); //! x[2-15]->x[1-14]
       int y_alpha = xy_allalphas.at(1); //! y[16-29]->y[1-14]
@@ -285,10 +286,10 @@ void read1()
           h0->Fill(de_data[0]);
           h1->Fill(de_data[1]);
 
-          // if (de_data[1] < threshold_plas_1)
-          // {
-          //   h_cross->Fill(de_data[0]);
-          // }
+          if (de_data[1] < threshold_plas_1)
+          {
+            h_cross1->Fill(de_data[0]);
+          }
         }
 
         //! time
@@ -316,7 +317,7 @@ void read1()
           //! If undetected in PLASTIC 0 but detected in PLASTIC 1 = PLASTIC 0'S CROSSTALK
           if (de_data[0] < threshold_plas_0)
           {
-            h_cross->Fill(de_data[1]);
+            h_cross0->Fill(de_data[1]);
           }
         }
       }
@@ -333,8 +334,11 @@ void read1()
   hmap1->Draw("COLZ");
 
   TCanvas* cn_cross = new TCanvas("cn_cross", "cn_cross", 700, 700);
-  cn_cross->cd();
-  h_cross->Draw();
+  cn_cross->Divide(2,1);
+  cn_cross->cd(1);
+  h_cross0->Draw();
+  cn_cross->cd(2);
+  h_cross1->Draw();
 
   // TCanvas* ctime = new TCanvas("ctime", "ctime", 800, 800);
   // ctime->Divide(3,1);
@@ -356,6 +360,10 @@ void read1()
 
   std::cout << "n_0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_0 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
   std::cout << "Efficiency_0 = " << (n_0/n_alpha)*100 << "%\n";
+
+  double n_cross0 = h_cross0->GetEntries();
+  std::cout << "n_cross0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross0 << "\n";
+  std::cout << "cross-talk0 = " << (n_cross0/n_0)*100 << "%\n";
 
   // h0->Draw();
   // h0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
@@ -379,6 +387,10 @@ void read1()
 
   std::cout << "n_1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_1 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
   std::cout << "Efficiency_1 = " << (n_1/n_alpha)*100 << "%\n";
+
+  double n_cross1 = h_cross1->GetEntries();
+  std::cout << "n_cross1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross1 << "\n";
+  std::cout << "cross-talk1 = " << (n_cross1/n_1) << "%\n";
 
   // h1->Draw();
   // h1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
