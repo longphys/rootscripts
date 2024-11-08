@@ -83,6 +83,10 @@ double CalScaleCo60[3] = {1., 1., 1.};
 
 // double CalScaleCo60[3] = {1.05, 1., 2.4};
 
+//! energy range to analyze timing resolution (MeV)
+double min_time = 0.35;
+double max_time = 0.4;
+
 //! Channels
 int channel[3] = {0, 1, 2};
 
@@ -92,10 +96,10 @@ void time()
   timer->Start();
 
   //! Files and trees
-  TFile* fsimCo60 = new TFile("./simfiles/withAl_simCo60_1.root", "read");
+  TFile* fsimCo60 = new TFile("~/data/simfiles/withAl_simCo60_1.root", "read");
   // TFile* fexpCo60 = new TFile("./expfiles/new/stilbene_dividers_Plastic_ch2_Co60_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9421_run_0_0001.root", "read");
   // TFile* fexpCo60 = new TFile("./expfiles/time/plastic_detectors_Co60_ch0HV1800_ch1HV2350_ch2HV2150_ch0_9841_ch1_9748_ch2_9702_run_0_0001.root", "read");
-  TFile* fexpCo60 = new TFile("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0001.root", "read");
+  TFile* fexpCo60 = new TFile("~/data//expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0001.root", "read");
   // TFile* fexpCo60 = new TFile("./expfiles/time/plastic_detectors_Co60_ch0HV2050_ch1HV2250_ch2HV1850_ch0_9803_ch1_9842_ch2_9854_run_0_0001.root", "read");
 
   TChain* chExpCo60 = new TChain("chexpCo60");
@@ -114,12 +118,12 @@ void time()
   // chExpCo60->Add("./expfiles/time/plastic_detectors_Co60_ch0HV1800_ch1HV2350_ch2HV2150_ch0_9841_ch1_9748_ch2_9702_run_0_0007.root?#AnalysisxTree");
   // chExpCo60->Add("./expfiles/time/plastic_detectors_Co60_ch0HV1800_ch1HV2350_ch2HV2150_ch0_9841_ch1_9748_ch2_9702_run_0_0008.root?#AnalysisxTree");
 
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0001.root?#AnalysisxTree");
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0002.root?#AnalysisxTree");
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0003.root?#AnalysisxTree");
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0004.root?#AnalysisxTree");
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0005.root?#AnalysisxTree");
-  chExpCo60->Add("./expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0006.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0001.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0002.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0003.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0004.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0005.root?#AnalysisxTree");
+  chExpCo60->Add("~/data/expfiles/time/2/plastic_detectors_Co60_ch0HV1900_ch1HV2250_ch2HV1850_ch0_9843_ch1_9805_ch2_9421_run_0_0006.root?#AnalysisxTree");
 
   // chExpCo60->Add("./expfiles/time/plastic_detectors_Co60_ch0HV2050_ch1HV2250_ch2HV1850_ch0_9803_ch1_9842_ch2_9854_run_0_0001.root?#AnalysisxTree");
   // chExpCo60->Add("./expfiles/time/plastic_detectors_Co60_ch0HV2050_ch1HV2250_ch2HV1850_ch0_9803_ch1_9842_ch2_9854_run_0_0002.root?#AnalysisxTree");
@@ -268,6 +272,20 @@ void time()
   TH1D* hTime1 = new TH1D("hTime1", "hTime1", 10000, -5000, 5000);
   TH1D* hTime2 = new TH1D("hTime2", "hTime2", 10000, -5000, 5000);
   TH1D* hTime3 = new TH1D("hTime3", "hTime3", 10000, -5000, 5000);
+  hTime3->SetLineWidth(3);
+  // hTime3->SetStats(0);
+
+  hTime3->GetYaxis()->SetTitle("Events");
+  hTime3->GetYaxis()->SetLabelFont(42);
+  hTime3->GetYaxis()->SetTitleFont(52);
+  hTime3->GetYaxis()->SetTitleSize(0.04);
+  hTime3->GetYaxis()->CenterTitle(true);
+
+  hTime3->GetXaxis()->SetTitle("Time difference (a. units)");
+  hTime3->GetXaxis()->SetLabelFont(42);
+  hTime3->GetXaxis()->SetTitleFont(52);
+  hTime3->GetXaxis()->SetTitleSize(0.04);
+  hTime3->GetXaxis()->CenterTitle(true);
   TF1* fGaus = new TF1("fGaus","gaus");
 
   auto a0 = std::to_string(a[0]);
@@ -277,31 +295,35 @@ void time()
   auto a2 = std::to_string(a[2]);
   auto b2 = std::to_string(-b[2]);
 
+  auto min_time_string = std::to_string(min_time);
+  auto max_time_string = std::to_string(max_time);
+
   std::string prompt0_full_str = 
-  "NeEvent.neutAmp[0] > (0.9+" + b0 + ")/" + a0 + " && " + 
-  "NeEvent.neutAmp[0] < (1.1+" + b0 + ")/" + a0 + " && " + 
-  "NeEvent.neutAmp[1] > (0.9+" + b1 + ")/" + a1 + " && " + 
-  "NeEvent.neutAmp[1] < (1.1+" + b1 + ")/" + a1;
+  "NeEvent.neutAmp[0] > (" + min_time_string + "+" + b0 + ")/" + a0 + " && " + 
+  "NeEvent.neutAmp[0] < (" + max_time_string + "+" + b0 + ")/" + a0 + " && " + 
+  "NeEvent.neutAmp[1] > (" + min_time_string + "+" + b1 + ")/" + a1 + " && " + 
+  "NeEvent.neutAmp[1] < (" + max_time_string + "+" + b1 + ")/" + a1;
   const char* prompt0_full = prompt0_full_str.c_str();
 
   std::string prompt1_full_str = 
-  "NeEvent.neutAmp[1] > (0.9+" + b1 + ")/" + a1 + " && " + 
-  "NeEvent.neutAmp[1] < (1.1+" + b1 + ")/" + a1 + " && " + 
-  "NeEvent.neutAmp[2] > (0.9+" + b2 + ")/" + a2 + " && " + 
-  "NeEvent.neutAmp[2] < (1.1+" + b2 + ")/" + a2;
+  "NeEvent.neutAmp[1] > (" + min_time_string + "+" + b1 + ")/" + a1 + " && " + 
+  "NeEvent.neutAmp[1] < (" + max_time_string + "+" + b1 + ")/" + a1 + " && " + 
+  "NeEvent.neutAmp[2] > (" + min_time_string + "+" + b2 + ")/" + a2 + " && " + 
+  "NeEvent.neutAmp[2] < (" + max_time_string + "+" + b2 + ")/" + a2;
   const char* prompt1_full = prompt1_full_str.c_str();
 
   std::string prompt2_full_str = 
-  "NeEvent.neutAmp[2] > (0.9+" + b2 + ")/" + a2 + " && " + 
-  "NeEvent.neutAmp[2] < (1.1+" + b2 + ")/" + a2 + " && " + 
-  "NeEvent.neutAmp[0] > (0.9+" + b0 + ")/" + a0 + " && " + 
-  "NeEvent.neutAmp[0] < (1.1+" + b0 + ")/" + a0;
+  "NeEvent.neutAmp[2] > (" + min_time_string + "+" + b2 + ")/" + a2 + " && " + 
+  "NeEvent.neutAmp[2] < (" + max_time_string + "+" + b2 + ")/" + a2 + " && " + 
+  "NeEvent.neutAmp[0] > (" + min_time_string + "+" + b0 + ")/" + a0 + " && " + 
+  "NeEvent.neutAmp[0] < (" + max_time_string + "+" + b0 + ")/" + a0;
   const char* prompt2_full = prompt2_full_str.c_str();
 
-  // TCanvas* CanvasTime = new TCanvas("CanvasTime", "CanvasTime", 800, 600);
-  // CanvasTime->cd();
-  // chExpCo60->Draw("NeEvent.neutTDC[2]-NeEvent.neutTDC[0]>>hTime3", prompt2_full, "");
-  // hTime3->Fit("fGaus", "", "", -200., 200.);
+  TCanvas* CanvasTime = new TCanvas("CanvasTime", "CanvasTime", 1100, 1000);
+  CanvasTime->SetLeftMargin(0.15);
+  CanvasTime->cd();
+  chExpCo60->Draw("NeEvent.neutTDC[2]-NeEvent.neutTDC[0]>>hTime3", prompt2_full, "");
+  hTime3->Fit("fGaus", "", "", -200., 200.);
 
   c2->cd(1);
   chExpCo60->Draw("NeEvent.neutTDC[0]-NeEvent.neutTDC[1]>>hTime1", prompt0_full, "");
@@ -348,6 +370,8 @@ void time()
 
   int threshChannel = 180;
   std::cout << "Energy Threshold = " << a[2]*threshChannel + b[2] << "(keV)\n";
+
+  std::cout << "CURRENT ENERGY RANGE FOR TIMING RESOLUTION: " << min_time << "-" << max_time << " (MeV)\n";
 
   std::cout << "\ntime: " << timer->RealTime() << " seconds\n";
 }

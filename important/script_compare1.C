@@ -45,29 +45,32 @@ int inithreshNa22 = 60.;
 int inithreshCo60 = 40.; 
 
 //! SIMULATION AND MEASUREMENT FILES
-TFile* fsimCs137 = new TFile("./simfiles/withAl_simCs137_1.root", "read");
-// TFile* fexpCs137 = new TFile("./expfiles/time/4/plastic_detectors_Cs137_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
-TFile* fexpCs137 = new TFile("./expfiles/time/5/plastic_detectors_Cs137_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fsimCs137 = new TFile("~/data/simfiles/withAl_simCs137_1.root", "read");
+// TFile* fexpCs137 = new TFile("~/data/expfiles/time/4/plastic_detectors_Cs137_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
+// TFile* fexpCs137 = new TFile("~/data/expfiles/time/5/plastic_detectors_Cs137_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fexpCs137 = new TFile("~/data/expfiles/time/6/plastic_detectors_Cs137_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
 
-TFile* fsimNa22 = new TFile("./simfiles/withAl_simNa22_2.root", "read");
-// TFile* fexpNa22 = new TFile("./expfiles/time/4/plastic_detectors_Na22_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
-TFile* fexpNa22 = new TFile("./expfiles/time/5/plastic_detectors_Na22_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fsimNa22 = new TFile("~/data/simfiles/withAl_simNa22_1.root", "read");
+// TFile* fexpNa22 = new TFile("~/data/expfiles/time/4/plastic_detectors_Na22_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
+// TFile* fexpNa22 = new TFile("~/data/expfiles/time/5/plastic_detectors_Na22_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fexpNa22 = new TFile("~/data/expfiles/time/6/plastic_detectors_Na22_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
 
-TFile* fsimCo60 = new TFile("./simfiles/withAl_simCo60_1.root", "read");
-// TFile* fexpCo60 = new TFile("./expfiles/time/4/plastic_detectors_Co60_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
-TFile* fexpCo60 = new TFile("./expfiles/time/5/plastic_detectors_Co60_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fsimCo60 = new TFile("~/data/simfiles/withAl_simCo60_1.root", "read");
+// TFile* fexpCo60 = new TFile("~/data/expfiles/time/4/plastic_detectors_Co60_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
+// TFile* fexpCo60 = new TFile("~/data/expfiles/time/5/plastic_detectors_Co60_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fexpCo60 = new TFile("~/data/expfiles/time/6/plastic_detectors_Co60_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
 
 //! CHANNEL CHANGE
-int channel = 0;
+// int channel = 0;
 // int channel = 1;
-// int channel = 2;
+int channel = 2;
 
 //! NUMBER OF ENTRIES FOR GRADIENT DESCENT
-int entriesExp = 500000;
-int entriesSim = 500000;
+// int entriesExp = 500000;
+// int entriesSim = 500000;
 
-// int entriesExp = 200000;
-// int entriesSim = 200000;
+int entriesExp = 100000;
+int entriesSim = 100000;
 //! FFT Threshold FOR GRADIENT DESCENT (30-1500)
 double threshExp = 65.;
 double threshSim = 65.;
@@ -261,7 +264,7 @@ double fitRes(double Sig1, double Sig2, double Sig3, TH1D* hCs137, TH1D* hNa22, 
   canvasFit->Modified();
   canvasFit->Update();
 
-  canvasFit->SaveAs("Resolution.png");
+  // canvasFit->SaveAs("Resolution.png");
 
   delete hRes;
   delete fRes;
@@ -844,6 +847,9 @@ void script_compare1()
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Ch1 = " << Ch1 << "; Ch2 = " << Ch2 << "; Ch3 = " << Ch3
     << "\nSig1 = " << dSig1 << "; Sig2 = " << dSig2 << "; Sig3 = " << dSig3 << "\n";
+
+    double energy_resolution_at_1MeV = sqrt( pow(coA,2.) + std::pow((coC/1.),2.) ) / 1;
+    std::cout << "E_resolution at 1MeV = " << energy_resolution_at_1MeV*100. << " (%)\n";
 
     cShow->cd(4);
     hcalCs137Filtered->GetXaxis()->UnZoom();

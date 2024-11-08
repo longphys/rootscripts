@@ -11,6 +11,7 @@
 #include "TF1.h"
 #include "TGraph.h"
 #include "TMarker.h"
+#include "TLegend.h"
 
 //! Range of experimental Cs137 and Na22 histograms (Bins)
 double xminExp = 100;
@@ -309,18 +310,34 @@ void fft1()
 
   //! Measurement
   canvas1->cd(1);
-  TFile* fileOpen1 = new TFile("./expfiles/new/save_stilbene_dividers_Plastic_ch2_Na22_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9421_run_0_0001.root", "read");
+  TFile* fileOpen1 = new TFile("../../expfiles/new/save_stilbene_dividers_Plastic_ch2_Na22_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9421_run_0_0001.root", "read");
   // TFile* fileOpen1 = new TFile("./expfiles/usable/save_stilbene_divider_Na22_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9841_run_0_0001.root", "read");
 
-  hChannel1 = (TH1D*)fileOpen1->Get("hCh1");
+  //!
+  TFile* file2 = new TFile("../../expfiles/time/6/plastic_detectors_Cs137_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
+
+  TTree* tree2 =  (TTree*) file2->Get("AnalysisxTree");
+
+  UShort_t value_exp[48];
+  tree2->SetBranchAddress("NeEvent.neutAmp[48]", &value_exp);
+
+  TH1D* hist2 = new TH1D("hist2", "Cs137 Measurement", binExp, xminExp, xmaxExp);
+
+  // for (int i = 0; i<tree2->GetEntriesFast(); i++){
+  for (int i = 0; i<300000; i++){
+    tree2->GetEntry(i);
+    if(value_exp[0]){hist2->Fill(value_exp[0]);}
+  }
+
+  hChannel1 = (TH1D*)hist2->Clone();
+  // hChannel1 = (TH1D*)fileOpen1->Get("hCh1");
   hChannel1->SetLineColor(kRed);
   hChannel1->SetXTitle("Channel");
   hChannel1->SetYTitle("Count");
   hChannel1->Draw();
 
   canvas1->cd(5);
-  TFile* fileOpen2 = new TFile("./expfiles/new/save_stilbene_dividers_Plastic_ch2_Cs137_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9421_run_0_0001.root", "read");
-
+  TFile* fileOpen2 = new TFile("../../expfiles/new/save_stilbene_dividers_Plastic_ch2_Cs137_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9421_run_0_0001.root", "read");
   
   hChannel2 = (TH1D*)fileOpen2->Get("hCh1");
   hChannel2->SetLineColor(kRed);
@@ -376,7 +393,7 @@ void fft1()
   TH1 *hm1 =nullptr;
   TVirtualFFT::SetTransform(nullptr);
   hm1 = hEvenChannel1->FFT(hm1, "MAG");
-  hm1->SetTitle("Magnitude of the transform");
+  hm1->SetTitle("Magnitude of the FFT transformation");
   hm1->Draw();
   
   TH1D* newhm1 = new TH1D("newhm1", "newhm1", binExpEven, -(xmaxExp - xminExp), xmaxExp - xminExp);
@@ -394,14 +411,42 @@ void fft1()
   }
 
   hLogis1->SetLineColor(kRed);
-  hLogis1->SetLineWidth(4);
+  hLogis1->SetLineWidth(3);
   hLogis1->Draw("same");
 
-  // TCanvas* CanvasFilter = new TCanvas("CanvasFilter", "CanvasFilter", 800, 600);
-  // CanvasFilter->cd()->SetLogy();
-  // hm1->Draw();
-  // // hLogis1->Scale(10000, "noSW2");
-  // hLogis1->Draw("same");
+  TCanvas* CanvasFilter = new TCanvas("CanvasFilter", "CanvasFilter", 800, 600);
+  CanvasFilter->cd()->SetLogy();
+  CanvasFilter->cd()->SetTicks();
+  hm1->Draw();
+
+  hm1->Rebin(5);
+  hm1->SetLineWidth(3);
+  hm1->SetStats(0);
+  hm1->GetXaxis()->SetRangeUser(0.,700.);
+
+  hm1->GetXaxis()->SetTitle("Frequency (a. units)");
+  hm1->GetXaxis()->SetLabelFont(42);
+  hm1->GetXaxis()->SetTitleFont(52);
+  hm1->GetXaxis()->SetTitleSize(0.04);
+  hm1->GetXaxis()->CenterTitle(true);
+
+  hm1->GetYaxis()->SetTitle("Magnitude");
+  hm1->GetYaxis()->SetLabelFont(42);
+  hm1->GetYaxis()->SetTitleFont(52);
+  hm1->GetYaxis()->SetTitleSize(0.04);
+  hm1->GetYaxis()->CenterTitle(true);
+
+  // hLogis1->Scale(10000, "noSW2");
+  hLogis1->Draw("same");
+
+  TLegend *legend = new TLegend(0.4, 0.55, 0.8, 0.85);
+  legend->SetBorderSize(0);
+  legend->SetLineWidth(2);
+  legend->SetTextSize(0.06);
+  legend->AddEntry(hm1, "Fourier image magnitude", "l");
+  legend->AddEntry(hLogis1, "Logistics function", "l");
+
+  legend->Draw();
 
   //! Pad8: Apply threshold
   canvas1->cd(4);
@@ -518,6 +563,70 @@ void fft1()
   hFiltered1->SetYTitle("Count");
   hFiltered1->Draw();
 
+  //! RESULT CANVAS
+  // TCanvas* CanvasFilter_result = new TCanvas("CanvasFilter_result", "CanvasFilter_result", 600, 900);
+  // CanvasFilter_result->Divide(1,2);
+
+  TCanvas* CanvasFilter_result = new TCanvas("CanvasFilter_result", "CanvasFilter_result", 1500, 700);
+  CanvasFilter_result->Divide(2,1);
+  CanvasFilter_result->cd(1)->SetTicks();
+  CanvasFilter_result->cd(1);
+  CanvasFilter_result->cd(1)->SetLeftMargin(0.05);
+  CanvasFilter_result->cd(1)->SetRightMargin(0.05);
+  hChannel1->Draw();
+
+  hChannel1->SetLineWidth(3);
+  hChannel1->SetTitle("");
+  hChannel1->SetLineColor(kBlue);
+  hChannel1->SetStats(0);
+  hChannel1->GetXaxis()->SetRangeUser(100., 500.);
+  hChannel1->GetYaxis()->SetRangeUser(0.,1000.);
+
+  hChannel1->GetXaxis()->SetTitle("Channel");
+  hChannel1->GetXaxis()->SetLabelFont(42);
+  hChannel1->GetXaxis()->SetTitleFont(52);
+  hChannel1->GetXaxis()->SetTitleSize(0.04);
+  hChannel1->GetXaxis()->CenterTitle(true);
+
+  hChannel1->GetYaxis()->SetTitle("Events");
+  hChannel1->GetYaxis()->SetLabelFont(42);
+  hChannel1->GetYaxis()->SetTitleFont(52);
+  hChannel1->GetYaxis()->SetTitleSize(0.04);
+  hChannel1->GetYaxis()->CenterTitle(true);
+
+  CanvasFilter_result->cd(2);
+  CanvasFilter_result->cd(2)->SetTicks();
+  CanvasFilter_result->cd(2)->SetLeftMargin(0.05);
+  CanvasFilter_result->cd(2)->SetRightMargin(0.15);
+  hFiltered1->Draw();
+
+  hFiltered1->SetLineWidth(3);
+  hFiltered1->SetTitle("");
+  hFiltered1->SetStats(0);
+  hFiltered1->GetXaxis()->SetRangeUser(100., 500.);
+  hFiltered1->GetYaxis()->SetRangeUser(0.,1000.);
+
+  hFiltered1->GetXaxis()->SetTitle("Channel");
+  hFiltered1->GetXaxis()->SetLabelFont(42);
+  hFiltered1->GetXaxis()->SetTitleFont(52);
+  hFiltered1->GetXaxis()->SetTitleSize(0.04);
+  hFiltered1->GetXaxis()->CenterTitle(true);
+
+  hFiltered1->GetYaxis()->SetTitle("Events");
+  hFiltered1->GetYaxis()->SetLabelFont(42);
+  hFiltered1->GetYaxis()->SetTitleFont(52);
+  hFiltered1->GetYaxis()->SetTitleSize(0.04);
+  hFiltered1->GetYaxis()->CenterTitle(true);
+
+  TLegend *legend2 = new TLegend(0.55, 0.55, 0.85, 0.85);
+  legend2->SetBorderSize(0);
+  legend2->SetLineWidth(2);
+  legend2->SetTextSize(0.04);
+  legend2->AddEntry(hChannel1, "Sample {}^{137}Cs Spectrum", "l");
+  legend2->AddEntry(hFiltered1, "Filtered {}^{137}Cs Spectrum", "l");
+
+  legend2->Draw();
+
   canvas2->cd(4);
   
   for(int i = 1; i <= binExp; i++)
@@ -550,6 +659,25 @@ void fft1()
   hFilDiff5Channel1->SetXTitle("Channel");
   hFilDiff5Channel1->Draw();
   hFiltered1->Draw("same");
+
+  //! RESULT CANVAS
+  TCanvas* CanvasDiff = new TCanvas("CanvasDiff", "CanvasDiff", 1200, 1000);
+  CanvasDiff->cd()->SetTicks();
+  CanvasDiff->cd()->SetGrid();
+  CanvasDiff->cd()->SetLeftMargin(0.15);
+  hFilDiff5Channel1->Draw();
+
+  hFilDiff5Channel1->SetLineWidth(5);
+  hFilDiff5Channel1->SetTitle("");
+  hFilDiff5Channel1->SetLineColor(kBlue);
+  hFilDiff5Channel1->SetStats(0);
+  hFilDiff5Channel1->GetXaxis()->SetRangeUser(100., 500.);
+
+  hFilDiff5Channel1->GetXaxis()->SetTitle("Channel");
+  hFilDiff5Channel1->GetXaxis()->SetLabelFont(42);
+  hFilDiff5Channel1->GetXaxis()->SetTitleFont(52);
+  hFilDiff5Channel1->GetXaxis()->SetTitleSize(0.04);
+  hFilDiff5Channel1->GetXaxis()->CenterTitle(true);
 
   canvas3->cd(2);
   canvas3->cd(2)->SetGridx();

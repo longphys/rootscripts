@@ -38,7 +38,8 @@ void chi2_2par_2(){
 
   int times = 150;
 
-  TCanvas* canvas2 = new TCanvas("canvas2", "canvas2", 800, 600);
+  TCanvas* canvas2 = new TCanvas("canvas2", "canvas2", 1000, 900);
+  canvas2->cd()->SetLeftMargin(0.15);
 
   TH1D* hSave = new TH1D();
 
@@ -127,13 +128,42 @@ void chi2_2par_2(){
     delete hChi2sigmaDown;
 
     canvas2->cd();
+
+    hGauss->SetStats(0);
+    hGauss->SetTitle("2 parameters example of gradient descent");
+    hGauss->GetXaxis()->SetTitle("X");
+    hGauss->GetXaxis()->SetLabelFont(42);
+    hGauss->GetXaxis()->SetTitleFont(52);
+    hGauss->GetXaxis()->SetTitleSize(0.04);
+    hGauss->GetXaxis()->CenterTitle(true);
+
+    hGauss->GetYaxis()->SetTitle("Y");
+    hGauss->GetYaxis()->SetLabelFont(42);
+    hGauss->GetYaxis()->SetTitleFont(52);
+    hGauss->GetYaxis()->SetTitleSize(0.04);
+    hGauss->GetYaxis()->CenterTitle(true);
+
+    hGauss->SetLineWidth(2);
+    hGauss->SetLineColor(kBlue);
     hGauss->Draw();
+
+    hSave->SetLineWidth(2);
     hSave->SetLineColor(kRed);
     hSave->Draw("same");
+
+    TLegend *legend = new TLegend(0.2, 0.55, 0.45, 0.85);
+    legend->SetBorderSize(0);
+    legend->SetLineWidth(2);
+    legend->SetTextSize(0.03);
+    legend->AddEntry(hGauss, "Model Gaussian", "l");
+    legend->AddEntry(hSave, "Modifying Gaussian", "l");
+
+    legend->Draw();
+
     canvas2->cd();
     canvas2->Modified();
     canvas2->Update();
-    canvas2->Print("output.gif+5");
+    canvas2->Print("output_final.gif+5");
   }
 
   // std::cout << "minimum chi2 = " << chi2current << "\n";

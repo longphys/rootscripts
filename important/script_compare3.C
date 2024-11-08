@@ -15,8 +15,8 @@
 //! histogram options
 double xminSim = 0.;
 double xmaxSim = 1.3;
-double xminExp = 100;
-double xmaxExp = 1500;
+double xminExp = 0.;
+double xmaxExp = 20000.;
 int binSim = (xmaxSim-xminSim)*1000.;
 int binExp = xmaxExp-xminExp;
 
@@ -45,7 +45,7 @@ TFile* fsimCs137 = new TFile("../../simfiles/withAl_simCs137_1.root", "read");
 // TFile* fexpCs137 = new TFile("./expfiles/time/4/plastic_detectors_Cs137_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
 // TFile* fexpCs137 = new TFile("./expfiles/time/5/plastic_detectors_Cs137_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
 
-TFile* fsimNa22 = new TFile("../../simfiles/withAl_simNa22_2.root", "read");
+TFile* fsimNa22 = new TFile("../../simfiles/withAl_simNa22_1.root", "read");
 // TFile* fexpNa22 = new TFile("./expfiles/time/4/plastic_detectors_Na22_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
 // TFile* fexpNa22 = new TFile("./expfiles/time/5/plastic_detectors_Na22_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
 
@@ -67,8 +67,8 @@ int entriesSim = 500000;
 // int entriesExp = 200000;
 // int entriesSim = 200000;
 //! FFT Threshold FOR GRADIENT DESCENT (30-1500)
-double threshExp = 1500.;
-double threshSim = 1500.;
+double threshExp = 800.;
+double threshSim = 800.;
 
 //! TUNING RATE FOR GRADIENT DESCENT
 //? To increase the speed of gradient descent, increase the tuning rate
@@ -88,7 +88,7 @@ double dSig2 = 5.5;
 
 //! SCALING
 //? ch0_9803_ch1_9842_ch2_9854
-double ScaleCs137[3] = {10.0, 8.5, 10.7};
+double ScaleCs137[3] = {8.5, 8.5, 10.7};
 double ScaleNa22[3] = {3.3, 3.6, 3.4};
 
 const char* TH1namechar;
@@ -307,7 +307,9 @@ void script_compare3()
 
     int de_sizeCsFFT = (int)deCs137->size(); //! Neutron Calibration
     double *de_dataCsFFT = deCs137->data();
+    if(de_dataCsFFT[channel]>5.){
     hExpCs137->Fill(de_dataCsFFT[channel]); 
+    }
   }
   
   TH1D* hExpCs137Filtered = fft(hExpCs137, 0.1, inithreshCs137, "hExpCs137Filtered", "Cs137 Spectrum Filtered", binExp, xminExp, xmaxExp);
@@ -322,7 +324,14 @@ void script_compare3()
 
     int de_sizeNaFFT = (int)deNa22->size(); //! Neutron Calibration
     double *de_dataNaFFT = deNa22->data();
-    hExpNa22->Fill(de_dataNaFFT[channel]); 
+    if(de_sizeNaFFT>5.){
+      hExpNa22->Fill(de_dataNaFFT[channel]); 
+    }
+  }
+
+  for(int i = 0; i<5; i++){
+    hExpCs137->SetBinContent(i,0.);
+    hExpNa22->SetBinContent(i,0.);
   }
 
   TH1D* hExpNa22Filtered = fft(hExpNa22, 0.1, inithreshNa22, "hExpNa22Filtered", "Na22 Spectrum Filtered", binExp, xminExp, xmaxExp);
@@ -361,6 +370,10 @@ void script_compare3()
 
   TCanvas* cShow = new TCanvas("cShow", "Compare Spectrum", 1800, 1000);
   cShow->Divide(2,2);
+  cShow->cd(1)->SetLeftMargin(0.15);
+  cShow->cd(3)->SetLeftMargin(0.15);
+  cShow->cd(2)->SetLeftMargin(0.15);
+  cShow->cd(4)->SetLeftMargin(0.15);
 
   TCanvas* cShow1 = new TCanvas("cShow1", "Gradient Check", 1500, 600);
   cShow1->Divide(4,2);
@@ -565,14 +578,48 @@ void script_compare3()
     chi2_Na22 = chi2(hcalNa22Filtered, hsimNa22resFiltered);
     std::cout << "~~~~~~~~~~~CHECK~~~~~~~~~~~~\n";
 
-    grChi2_Cs137->SetTitle("|r-Chi2 - 1| by iteration (Cs137)");
+    grChi2_Cs137->SetTitle("|Reduced #chi^{2} - 1| by iteration ({}^{137}Cs)");
+    cShow->cd(1)->SetTicks();
+    cShow->cd(1)->SetGrid();
     grChi2_Cs137->GetXaxis()->SetTitle("Iteration");
-    grChi2_Cs137->GetYaxis()->SetTitle("|r-Chi2 - 1|");
+    grChi2_Cs137->GetYaxis()->SetTitle("|r-#chi^{2} - 1|");
+
+    grChi2_Cs137->SetStats(0);
+    grChi2_Cs137->SetLineColor(kBlack);
+    grChi2_Cs137->SetLineWidth(3);
+
+    grChi2_Cs137->GetXaxis()->SetLabelFont(42);
+    grChi2_Cs137->GetXaxis()->SetTitleFont(52);
+    grChi2_Cs137->GetXaxis()->SetTitleSize(0.04);
+    grChi2_Cs137->GetXaxis()->CenterTitle(true);
+
+    grChi2_Cs137->GetYaxis()->SetLabelFont(42);
+    grChi2_Cs137->GetYaxis()->SetTitleFont(52);
+    grChi2_Cs137->GetYaxis()->SetTitleSize(0.04);
+    grChi2_Cs137->GetYaxis()->CenterTitle(true);
+
     grChi2_Cs137->AddPoint(count, chi2_Cs137);
 
-    grChi2_Na22->SetTitle("|r-Chi2 - 1| by iteration (Na22)");
+    grChi2_Na22->SetTitle("|Reduced #chi^{2} - 1| by iteration ({}^{22}Na)");
+    cShow->cd(2)->SetTicks();
+    cShow->cd(2)->SetGrid();
     grChi2_Na22->GetXaxis()->SetTitle("Iteration");
-    grChi2_Na22->GetYaxis()->SetTitle("|r-Chi2 - 1|");
+    grChi2_Na22->GetYaxis()->SetTitle("|r-#chi^{2} - 1|");
+
+    grChi2_Na22->SetStats(0);
+    grChi2_Na22->SetLineColor(kBlack);
+    grChi2_Na22->SetLineWidth(3);
+
+    grChi2_Na22->GetXaxis()->SetLabelFont(42);
+    grChi2_Na22->GetXaxis()->SetTitleFont(52);
+    grChi2_Na22->GetXaxis()->SetTitleSize(0.04);
+    grChi2_Na22->GetXaxis()->CenterTitle(true);
+
+    grChi2_Na22->GetYaxis()->SetLabelFont(42);
+    grChi2_Na22->GetYaxis()->SetTitleFont(52);
+    grChi2_Na22->GetYaxis()->SetTitleSize(0.04);
+    grChi2_Na22->GetYaxis()->CenterTitle(true);
+
     grChi2_Na22->AddPoint(count, chi2_Na22);
 
     cShow->cd(1);
@@ -634,23 +681,81 @@ void script_compare3()
     std::cout << "Ch1 = " << Ch1 << "; Ch2 = " << Ch2 
     << "\nSig1 = " << dSig1 << "; Sig2 = " << dSig2 << "\n";
 
+    double energy_resolution_at_1MeV = sqrt( pow(coA,2.) + std::pow((coC/1.),2.) ) / 1;
+    std::cout << "E_resolution at 1MeV = " << energy_resolution_at_1MeV*100. << " (%)\n";
+
     cShow->cd(3);
+    cShow->cd(3)->SetTicks();
+    hcalCs137Filtered->SetTitle("");
+    hcalCs137Filtered->GetXaxis()->SetTitle("E(MeVee)");
+    hcalCs137Filtered->GetYaxis()->SetTitle("Events");
+
+    hcalCs137Filtered->SetStats(0);
+    hcalCs137Filtered->SetLineWidth(1);
+
+    hcalCs137Filtered->GetXaxis()->SetLabelFont(42);
+    hcalCs137Filtered->GetXaxis()->SetTitleFont(52);
+    hcalCs137Filtered->GetXaxis()->SetTitleSize(0.04);
+    hcalCs137Filtered->GetXaxis()->CenterTitle(true);
+
+    hcalCs137Filtered->GetYaxis()->SetLabelFont(42);
+    hcalCs137Filtered->GetYaxis()->SetTitleFont(52);
+    hcalCs137Filtered->GetYaxis()->SetTitleSize(0.04);
+    hcalCs137Filtered->GetYaxis()->CenterTitle(true);
+
     hcalCs137Filtered->GetXaxis()->UnZoom();
     hsimCs137resFiltered->GetXaxis()->UnZoom();
     hcalCs137Filtered->SetLineColor(kRed);
     hcalCs137Filtered->Draw();
     hsimCs137resFiltered->Scale(ScaleCs137[channel], "noSW2");
     hsimCs137resFiltered->Draw("same");
-    cShow->cd(3)->Modified();
-    cShow->cd(3)->Update();
+
+    TLegend *legend = new TLegend(0.4, 0.55, 0.8, 0.85);
+    legend->SetBorderSize(0);
+    legend->SetLineWidth(2);
+    legend->SetTextSize(0.06);
+    legend->AddEntry(hcalCs137Filtered, "{}^{137}Cs Measurement", "l");
+    legend->AddEntry(hsimCs137resFiltered, "{}^{137}Cs Simulation", "l");
+
+    legend->Draw();
 
     cShow->cd(4);
+    cShow->cd(4)->SetTicks();
+    hcalNa22Filtered->SetTitle("");
+    hcalNa22Filtered->GetXaxis()->SetTitle("E(MeVee)");
+    hcalNa22Filtered->GetYaxis()->SetTitle("Events");
+
+    hcalNa22Filtered->SetStats(0);
+    hcalNa22Filtered->SetLineWidth(1);
+
+    hcalNa22Filtered->GetXaxis()->SetLabelFont(42);
+    hcalNa22Filtered->GetXaxis()->SetTitleFont(52);
+    hcalNa22Filtered->GetXaxis()->SetTitleSize(0.04);
+    hcalNa22Filtered->GetXaxis()->CenterTitle(true);
+
+    hcalNa22Filtered->GetYaxis()->SetLabelFont(42);
+    hcalNa22Filtered->GetYaxis()->SetTitleFont(52);
+    hcalNa22Filtered->GetYaxis()->SetTitleSize(0.04);
+    hcalNa22Filtered->GetYaxis()->CenterTitle(true);
+
     hcalNa22Filtered->GetXaxis()->UnZoom();
     hsimNa22resFiltered->GetXaxis()->UnZoom();
     hcalNa22Filtered->SetLineColor(kRed);
     hcalNa22Filtered->Draw();
     hsimNa22resFiltered->Scale(ScaleNa22[channel], "noSW2");
     hsimNa22resFiltered->Draw("same");
+
+    TLegend *legend1 = new TLegend(0.4, 0.55, 0.8, 0.85);
+    legend1->SetBorderSize(0);
+    legend1->SetLineWidth(10);
+    legend1->SetTextSize(0.06);
+    legend1->AddEntry(hcalNa22Filtered, "{}^{22}Na Measurement", "l");
+    legend1->AddEntry(hsimNa22resFiltered, "{}^{22}Na Simulation", "l");
+
+    legend1->Draw();
+
+    cShow->cd(3)->Modified();
+    cShow->cd(3)->Update();
     cShow->cd(4)->Modified();
     cShow->cd(4)->Update();
 
@@ -715,7 +820,7 @@ void script_compare3()
     cShow1->cd(8)->Update();
 
     cShow->cd();
-    cShow->Print("script_compare.gif+50");
+    // cShow->Print("script_compare3_final3.gif+50");
     
     if(count > 1){
       if (chi2_Cs137 < chi2limit){
@@ -770,7 +875,7 @@ void script_compare3()
     else{}
 
     count++;
-  }
+  } 
 
   std::cout << "\ntime: " << timer->RealTime() << " seconds\n";
 }

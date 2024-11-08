@@ -50,7 +50,8 @@ void chi2_2par_1(){
         hRandom->Fill(rand3->Gaus(mean,sigma));
       }
 
-      double chi2 = hGauss->Chi2Test(hRandom, "UU CHI2");
+      // double chi2 = hGauss->Chi2Test(hRandom, "UU CHI2");
+      double chi2 = hGauss->Chi2Test(hRandom, "UU CHI2/NDF");
 
       if (chi2 < chi2Save){
         hSave = (TH1D*)hRandom->Clone();
@@ -153,10 +154,24 @@ void chi2_2par_1(){
     delete hChi2sigmaDown;
   }
 
-  TCanvas* canvas1 = new TCanvas("canvas1", "Compare Chi2", 800, 600);
+  TCanvas* canvas1 = new TCanvas("canvas1", "Compare Chi2", 1000, 900);
   canvas1->cd();
-  hChi2->GetXaxis()->SetTitle("Sigma");
-  hChi2->GetYaxis()->SetTitle("Mean");
+  canvas1->cd()->SetLeftMargin(0.15);
+  hChi2->SetStats(0);
+  hChi2->SetTitle("#chi ^{2} (#mu, #sigma) map");
+
+  hChi2->GetXaxis()->SetLabelFont(42);
+  hChi2->GetXaxis()->SetTitleFont(52);
+  hChi2->GetXaxis()->SetTitleSize(0.04);
+  hChi2->GetXaxis()->CenterTitle(true);
+
+  hChi2->GetYaxis()->SetLabelFont(42);
+  hChi2->GetYaxis()->SetTitleFont(52);
+  hChi2->GetYaxis()->SetTitleSize(0.04);
+  hChi2->GetYaxis()->CenterTitle(true);
+
+  hChi2->GetXaxis()->SetTitle("Standard deviation #sigma");
+  hChi2->GetYaxis()->SetTitle("Mean #mu");
   hChi2->Draw("colz");
   grPath->SetLineColor(kRed);
   grPath->SetLineWidth(2);

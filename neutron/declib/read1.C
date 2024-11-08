@@ -16,8 +16,20 @@ vector <unsigned int> channel;
 int startingChannelNum = 0;
 int endingChannelNum = 29;
 
+//! Calibration
+double ECs137 = 0.477;
+double ENa22 = 1.061;
+
+int ChCs137[2] = {365, 283};
+int ChNa22[2] = {860, 642};
+
+double a[2], b[2];
+
+double xminCal[2], xmaxCal[2];
+
 void read1()
 {
+
   auto timer = new TStopwatch();
   timer->Start();
 
@@ -95,29 +107,62 @@ void read1()
   tree->SetBranchAddress("Channel", &ch);
   tree->SetBranchAddress("Time", &time);
 
-  TH2F* hmap_alpha = new TH2F("hmap_alpha", "hmap_alpha", 16, 0, 16, 16, 0, 16);
-  TH2F* hmap = new TH2F("hmap", "hmap", 16, 0, 16, 16, 0, 16);
-  TH2F* hmap1 = new TH2F("hmap1", "hmap1", 16, 0, 16, 16, 0, 16);
+  TH2F* hmap_alpha = new TH2F("hmap_alpha", "hmap_alpha", 14, 1, 15, 14, 1, 15);
+  TH2F* hmap_total = new TH2F("hmap_total", "hmap_total", 14, 1, 15, 14, 1, 15);
+  TH2F* hmap = new TH2F("hmap", "hmap", 14, 1, 15, 14, 1, 15);
+  TH2F* hmap1 = new TH2F("hmap1", "hmap1", 14, 1, 15, 14, 1, 15);
 
   double xmin = 0.;
   double xmax = 10000.;
+  double bin = (xmax-xmin);
+  // double bin = (xmax-xmin)/20.;
   double xminTime = -10.;
   double xmaxTime = 10.;
 
-  TH1D* heff0 = new TH1D("heff0", "heff0", 10000, xmin, xmax);
-  TH1D* heff1 = new TH1D("heff1", "heff1", 10000, xmin, xmax);
+  TH1D* heff0 = new TH1D("heff0", "heff0", bin, xmin, xmax);
+  TH1D* heff1 = new TH1D("heff1", "heff1", bin, xmin, xmax);
 
-  TH1D* h0 = new TH1D("h0", "h0", 10000, xmin, xmax);
-  TH1D* h1 = new TH1D("h1", "h1", 10000, xmin, xmax);
-  TH1D* h_cross0 = new TH1D("h_cross0", "h_cross0", 10000, xmin, xmax);
-  TH1D* h_cross1 = new TH1D("h_cross1", "h_cross1", 10000, xmin, xmax);
+  TH1D* h0 = new TH1D("h0", "h0", bin, xmin, xmax);
+  TH1D* h1 = new TH1D("h1", "h1", bin, xmin, xmax);
+  TH1D* h_cross0 = new TH1D("h_cross0", "h_cross0", bin, xmin, xmax);
+  TH1D* h_cross1 = new TH1D("h_cross1", "h_cross1", bin, xmin, xmax);
+
+  TCanvas* cFit = new TCanvas("cFit", "Linear calibration", 800, 600);
+  for(int i = 0; i < 2; i++){
+    TH1D* hCali = new TH1D("hCali", "Calibration fit", bin, xmin, xmax);
+    hCali->SetBinContent(ChCs137[i] - xmin, ECs137);
+    hCali->SetBinContent(ChNa22[i] - xmax, ENa22);
+
+    TF1* fCali = new TF1("fCali", "[0]*x + [1]", xmin, xmax);
+
+    cFit->Divide(2,1);
+    cFit->cd(1);
+    std::cout << "\nENERGY CALIBRATION\n";
+    hCali->Fit("fCali");
+
+    a[i] = fCali->GetParameter(0);
+    b[i] = fCali->GetParameter(1);
+
+    a[0]=0.0011798;
+    b[0]=0.0469636;
+    a[1]=0.00162674;
+    b[1]=0.0174457;
+
+    xminCal[i] = xmin*a[i]+b[i];
+    xmaxCal[i] = xmax*a[i]+b[i];
+  }
+
+
+  TH1D* h0_cal = new TH1D("h0_cal", "h0_cal", bin/10, xminCal[0], xminCal[0]);
+  TH1D* h_cross0_cal = new TH1D("h_cross0_cal", "h_cross0_cal", bin/10, xminCal[1], xmaxCal[1]);
 
   // TH1D* h_time0 = new TH1D("h_time0", "h_time0", 1000, xminTime, xmaxTime);
   // TH1D* h_time1 = new TH1D("h_time1", "h_time1", 1000, xminTime, xmaxTime);
   // TH1D* h_timetest = new TH1D("h_timetest", "h_timetest", 1000, xminTime, xmaxTime);
 
   long int entries = tree->GetEntriesFast();
-  entries = (int)1.0e7;
+  // entries = (int)1.0e7;
+  // entries = (int)5.0e7;
   //std::cout << "test loop:" << std::endl;
 
   // double threshold_plas_0 = 30.;
@@ -129,7 +174,7 @@ void read1()
   // double threshold_plas_0 = 300.;
   // double threshold_plas_1 = 300.;
 
-  int beam_xc = 9;
+  int beam_xc = 8;
   int beam_yc = 8;
 
   int counttest = 0;
@@ -258,11 +303,11 @@ void read1()
         y_alpha -= 15;
         hmap_alpha->Fill(x_alpha, y_alpha);
 
-        if ((x_alpha == beam_xc) && (y_alpha == beam_yc))
-        {
-          heff0->Fill(de_data[0]);
-          heff1->Fill(de_data[1]);
-        }
+        // if ((x_alpha == beam_xc) && (y_alpha == beam_yc))
+        // {
+        //   heff0->Fill(de_data[0]);
+        //   heff1->Fill(de_data[1]);
+        // }
       }
     }
 
@@ -280,16 +325,18 @@ void read1()
         x -= 1;
         y -= 15;
         hmap->Fill(x, y);
+        hmap_total->Fill(x, y);
 
         if ((x == beam_xc)&& (y == beam_yc))
         {
           h0->Fill(de_data[0]);
+          h0_cal->Fill(a[0]*(de_data[0]+0.5) + b[0]);
           h1->Fill(de_data[1]);
 
-          if (de_data[1] < threshold_plas_1)
-          {
-            h_cross1->Fill(de_data[0]);
-          }
+          // if (de_data[1] < threshold_plas_1)
+          // {
+          //   h_cross1->Fill(de_data[0]);
+          // }
         }
 
         //! time
@@ -309,6 +356,8 @@ void read1()
         x1-= 1;
         y1 -= 15;
         hmap1->Fill(x1, y1);
+        hmap_total->Fill(x1, y1);
+
         if ((x1 == beam_xc)&& (y1 == beam_yc))
         {
           // h0->Fill(de_data[0]);
@@ -318,6 +367,7 @@ void read1()
           if (de_data[0] < threshold_plas_0)
           {
             h_cross0->Fill(de_data[1]);
+            h_cross0_cal->Fill(a[1]*(de_data[1]+0.5) + b[1]);
           }
         }
       }
@@ -403,6 +453,68 @@ void read1()
   c->cd(2)->Modified();
 
   // std::cout << "counttest = " << counttest << " = " << (double)(counttest*100)/entries << "% of " << entries << " entries.\n";
+
+  TCanvas* c_total = new TCanvas("c_total", "c_total", 1700, 500);
+  c_total->Divide(3,1);
+  c_total->cd(1);
+  c_total->cd(1)->SetRightMargin(0.15);
+  hmap_alpha->SetTitle("Amplitude from alpha recoils");
+
+  hmap_alpha->GetXaxis()->SetTitle("X");
+  hmap_alpha->GetXaxis()->SetLabelFont(42);
+  hmap_alpha->GetXaxis()->SetTitleFont(42);
+  hmap_alpha->GetXaxis()->SetTitleSize(0.04);
+  hmap_alpha->GetXaxis()->CenterTitle(true);
+
+  hmap_alpha->GetYaxis()->SetTitle("Y");
+  hmap_alpha->GetYaxis()->SetLabelFont(42);
+  hmap_alpha->GetYaxis()->SetTitleFont(42);
+  hmap_alpha->GetYaxis()->SetTitleSize(0.04);
+  hmap_alpha->GetYaxis()->CenterTitle(true);
+  hmap_alpha->SetStats(0);
+  hmap_alpha->Draw("col z");
+
+  c_total->cd(2);
+  c_total->cd(2)->SetRightMargin(0.15);
+  hmap_total->SetTitle("Amplitude from silicon and plastic detectors");
+  hmap_total->GetXaxis()->SetTitle("X");
+  hmap_total->GetXaxis()->SetLabelFont(42);
+  hmap_total->GetXaxis()->SetTitleFont(42);
+  hmap_total->GetXaxis()->SetTitleSize(0.04);
+  hmap_total->GetXaxis()->CenterTitle(true);
+
+  hmap_total->GetYaxis()->SetTitle("Y");
+  hmap_total->GetYaxis()->SetLabelFont(42);
+  hmap_total->GetYaxis()->SetTitleFont(42);
+  hmap_total->GetYaxis()->SetTitleSize(0.04);
+  hmap_total->GetYaxis()->CenterTitle(true);
+  hmap_total->SetStats(0);
+  hmap_total->Draw("col z");
+
+  c_total->cd(3);
+  c_total->cd(3)->SetRightMargin(0.15);
+  hmap->SetTitle("Amplitude from silicon and the centered plastic detector");
+  hmap->GetXaxis()->SetTitle("X");
+  hmap->GetXaxis()->SetLabelFont(42);
+  hmap->GetXaxis()->SetTitleFont(42);
+  hmap->GetXaxis()->SetTitleSize(0.04);
+  hmap->GetXaxis()->CenterTitle(true);
+
+  hmap->GetYaxis()->SetTitle("Y");
+  hmap->GetYaxis()->SetLabelFont(42);
+  hmap->GetYaxis()->SetTitleFont(42);
+  hmap->GetYaxis()->SetTitleSize(0.04);
+  hmap->GetYaxis()->CenterTitle(true);
+  hmap->SetStats(0);
+  hmap->Draw("col z");
+
+  TCanvas* c_crosstalk_calibrated = new TCanvas("c_crosstalk_calibrated", "c_crosstalk_calibrated", 1500, 700);
+  c_crosstalk_calibrated->Divide(2,1);
+  c_crosstalk_calibrated->cd(1);
+  h0_cal->Draw();
+
+  c_crosstalk_calibrated->cd(2);
+  h_cross0_cal->Draw();
 
   std::cout << "\ntime: " << timer->RealTime() << " (s)\n";
 }
