@@ -314,14 +314,14 @@ void fft1()
   // TFile* fileOpen1 = new TFile("./expfiles/usable/save_stilbene_divider_Na22_no_coinc_ch0HV2100_ch1HV2300_ch2HV1900_ch0_9751_ch1_9800_ch2_9841_run_0_0001.root", "read");
 
   //!
-  TFile* file2 = new TFile("../../expfiles/time/6/plastic_detectors_Cs137_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
+  TFile* file2 = new TFile("../../expfiles/time/6/plastic_detectors_Na22_ch0HV1899_ch1HV1915_ch2HV1950_ch0_9668_ch1_9806_ch2_9852_run_0_0001.root", "read");
 
   TTree* tree2 =  (TTree*) file2->Get("AnalysisxTree");
 
   UShort_t value_exp[48];
   tree2->SetBranchAddress("NeEvent.neutAmp[48]", &value_exp);
 
-  TH1D* hist2 = new TH1D("hist2", "Cs137 Measurement", binExp, xminExp, xmaxExp);
+  TH1D* hist2 = new TH1D("hist2", "Na22 Measurement", binExp, xminExp, xmaxExp);
 
   // for (int i = 0; i<tree2->GetEntriesFast(); i++){
   for (int i = 0; i<300000; i++){
@@ -621,7 +621,7 @@ void fft1()
   TLegend *legend2 = new TLegend(0.55, 0.55, 0.85, 0.85);
   legend2->SetBorderSize(0);
   legend2->SetLineWidth(2);
-  legend2->SetTextSize(0.04);
+  legend2->SetTextSize(0.03);
   legend2->AddEntry(hChannel1, "Sample {}^{137}Cs Spectrum", "l");
   legend2->AddEntry(hFiltered1, "Filtered {}^{137}Cs Spectrum", "l");
 
@@ -666,10 +666,16 @@ void fft1()
   CanvasDiff->cd()->SetGrid();
   CanvasDiff->cd()->SetLeftMargin(0.15);
   hFilDiff5Channel1->Draw();
+  hFilDiff5Channel1->GetYaxis()->SetRangeUser(-40, 100);
+  hFiltered1->Scale(0.1, "noSW2");
+
+  hFiltered1->SetLineColor(kBlack);
+  hFiltered1->SetLineWidth(5);
+  hFiltered1->Draw("same");
 
   hFilDiff5Channel1->SetLineWidth(5);
   hFilDiff5Channel1->SetTitle("");
-  hFilDiff5Channel1->SetLineColor(kBlue);
+  hFilDiff5Channel1->SetLineColor(kRed);
   hFilDiff5Channel1->SetStats(0);
   hFilDiff5Channel1->GetXaxis()->SetRangeUser(100., 500.);
 
@@ -678,6 +684,15 @@ void fft1()
   hFilDiff5Channel1->GetXaxis()->SetTitleFont(52);
   hFilDiff5Channel1->GetXaxis()->SetTitleSize(0.04);
   hFilDiff5Channel1->GetXaxis()->CenterTitle(true);
+
+  TLegend *legendDiff = new TLegend(0.55, 0.55, 0.85, 0.85);
+  legendDiff->SetBorderSize(0);
+  legendDiff->SetLineWidth(2);
+  legendDiff->SetTextSize(0.03);
+  legendDiff->AddEntry(hFiltered1, "Filtered {}^{137}Cs Spectrum", "l");
+  legendDiff->AddEntry(hFilDiff5Channel1, "Corresponding first derivative", "l");
+
+  legendDiff->Draw();
 
   canvas3->cd(2);
   canvas3->cd(2)->SetGridx();

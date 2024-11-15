@@ -84,8 +84,8 @@ double CalScaleCo60[3] = {1., 1., 1.};
 // double CalScaleCo60[3] = {1.05, 1., 2.4};
 
 //! energy range to analyze timing resolution (MeV)
-double min_time = 0.35;
-double max_time = 0.4;
+double min_time = 0.9;
+double max_time = 1.1;
 
 //! Channels
 int channel[3] = {0, 1, 2};
@@ -273,7 +273,7 @@ void time()
   TH1D* hTime2 = new TH1D("hTime2", "hTime2", 10000, -5000, 5000);
   TH1D* hTime3 = new TH1D("hTime3", "hTime3", 10000, -5000, 5000);
   hTime3->SetLineWidth(3);
-  // hTime3->SetStats(0);
+  hTime3->SetStats(0);
 
   hTime3->GetYaxis()->SetTitle("Events");
   hTime3->GetYaxis()->SetLabelFont(42);
@@ -322,6 +322,8 @@ void time()
   TCanvas* CanvasTime = new TCanvas("CanvasTime", "CanvasTime", 1100, 1000);
   CanvasTime->SetLeftMargin(0.15);
   CanvasTime->cd();
+  CanvasTime->SetTickx();
+  CanvasTime->SetTicky();
   chExpCo60->Draw("NeEvent.neutTDC[2]-NeEvent.neutTDC[0]>>hTime3", prompt2_full, "");
   hTime3->Fit("fGaus", "", "", -200., 200.);
 

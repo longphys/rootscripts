@@ -155,13 +155,14 @@ void read1()
 
   TH1D* h0_cal = new TH1D("h0_cal", "h0_cal", bin/10, xminCal[0], xminCal[0]);
   TH1D* h_cross0_cal = new TH1D("h_cross0_cal", "h_cross0_cal", bin/10, xminCal[1], xmaxCal[1]);
+  TH1D* h_alpha_amplitude = new TH1D("h_alpha_amplitude", "h_alpha_amplitude", bin, xmin, xmax);
 
   // TH1D* h_time0 = new TH1D("h_time0", "h_time0", 1000, xminTime, xmaxTime);
   // TH1D* h_time1 = new TH1D("h_time1", "h_time1", 1000, xminTime, xmaxTime);
   // TH1D* h_timetest = new TH1D("h_timetest", "h_timetest", 1000, xminTime, xmaxTime);
 
   long int entries = tree->GetEntriesFast();
-  // entries = (int)1.0e7;
+  // entries = (int)1.0e6;
   // entries = (int)5.0e7;
   //std::cout << "test loop:" << std::endl;
 
@@ -204,6 +205,9 @@ void read1()
     //   h_time1->Fill(time_data[1]);
     // }
 
+    if(de_data[2]>0.){
+      h_alpha_amplitude->Fill(de_data[2]);
+    }
 
     // std::cout << "de->size() = " << de_size << std::endl;
     // std::cout << "time->size() = " << time_size << std::endl;
@@ -454,10 +458,16 @@ void read1()
 
   // std::cout << "counttest = " << counttest << " = " << (double)(counttest*100)/entries << "% of " << entries << " entries.\n";
 
+  TCanvas* c_total1 = new TCanvas("c_total1", "c_total1", 1200, 1000);
+  TCanvas* c_total2 = new TCanvas("c_total2", "c_total2", 1200, 1000);
+  TCanvas* c_total3 = new TCanvas("c_total3", "c_total3", 1200, 1000);
+
   TCanvas* c_total = new TCanvas("c_total", "c_total", 1700, 500);
   c_total->Divide(3,1);
-  c_total->cd(1);
-  c_total->cd(1)->SetRightMargin(0.15);
+  // c_total->cd(1);
+  // c_total->cd(1)->SetRightMargin(0.15);
+  c_total1->cd();
+  c_total1->SetRightMargin(0.15);
   hmap_alpha->SetTitle("Amplitude from alpha recoils");
 
   hmap_alpha->GetXaxis()->SetTitle("X");
@@ -474,8 +484,10 @@ void read1()
   hmap_alpha->SetStats(0);
   hmap_alpha->Draw("col z");
 
-  c_total->cd(2);
-  c_total->cd(2)->SetRightMargin(0.15);
+  // c_total->cd(2);
+  // c_total->cd(2)->SetRightMargin(0.15);
+  c_total2->cd();
+  c_total2->SetRightMargin(0.15);
   hmap_total->SetTitle("Amplitude from silicon and plastic detectors");
   hmap_total->GetXaxis()->SetTitle("X");
   hmap_total->GetXaxis()->SetLabelFont(42);
@@ -491,8 +503,10 @@ void read1()
   hmap_total->SetStats(0);
   hmap_total->Draw("col z");
 
-  c_total->cd(3);
-  c_total->cd(3)->SetRightMargin(0.15);
+  // c_total->cd(3);
+  // c_total->cd(3)->SetRightMargin(0.15);
+  c_total3->cd();
+  c_total3->SetRightMargin(0.15);
   hmap->SetTitle("Amplitude from silicon and the centered plastic detector");
   hmap->GetXaxis()->SetTitle("X");
   hmap->GetXaxis()->SetLabelFont(42);
@@ -508,13 +522,76 @@ void read1()
   hmap->SetStats(0);
   hmap->Draw("col z");
 
-  TCanvas* c_crosstalk_calibrated = new TCanvas("c_crosstalk_calibrated", "c_crosstalk_calibrated", 1500, 700);
-  c_crosstalk_calibrated->Divide(2,1);
-  c_crosstalk_calibrated->cd(1);
+  TCanvas* c_crosstalk_calibrated1 = new TCanvas("c_crosstalk_calibrated1", "c_crosstalk_calibrated1", 1100, 1000);
+  c_crosstalk_calibrated1->SetTicks();
+  c_crosstalk_calibrated1->SetGrid();
+  TCanvas* c_crosstalk_calibrated2 = new TCanvas("c_crosstalk_calibrated2", "c_crosstalk_calibrated2", 1100, 1000);
+  c_crosstalk_calibrated2->SetTicks();
+  c_crosstalk_calibrated2->SetGrid();
+
+  // TCanvas* c_crosstalk_calibrated = new TCanvas("c_crosstalk_calibrated", "c_crosstalk_calibrated", 1500, 700);
+  // c_crosstalk_calibrated->Divide(2,1);
+  // c_crosstalk_calibrated->cd(1);
+  c_crosstalk_calibrated1->cd();
+  h0_cal->SetTitle("");
+  h0_cal->SetLineWidth(2);
+  h0_cal->SetLineColor(kBlue);
+  h0_cal->SetStats(0);
+  h0_cal->GetXaxis()->SetTitle("Energy (MeV)");
+  h0_cal->GetXaxis()->SetLabelFont(42);
+  h0_cal->GetXaxis()->SetTitleFont(42);
+  h0_cal->GetXaxis()->SetTitleSize(0.04);
+  h0_cal->GetXaxis()->CenterTitle(true);
+  h0_cal->GetYaxis()->SetTitle("Events");
+  h0_cal->GetYaxis()->SetLabelFont(42);
+  h0_cal->GetYaxis()->SetTitleFont(42);
+  h0_cal->GetYaxis()->SetTitleSize(0.04);
+  h0_cal->GetYaxis()->CenterTitle(true);
   h0_cal->Draw();
 
-  c_crosstalk_calibrated->cd(2);
+  // c_crosstalk_calibrated->cd(2);
+  c_crosstalk_calibrated2->cd();
+  h_cross0_cal->SetTitle("");
+  h_cross0_cal->SetLineWidth(2);
+  h_cross0_cal->SetLineColor(kRed);
+  h_cross0_cal->SetStats(0);
+  h_cross0_cal->GetXaxis()->SetTitle("Energy (MeV)");
+  h_cross0_cal->GetXaxis()->SetLabelFont(42);
+  h_cross0_cal->GetXaxis()->SetTitleFont(42);
+  h_cross0_cal->GetXaxis()->SetTitleSize(0.04);
+  h_cross0_cal->GetXaxis()->CenterTitle(true);
+  h_cross0_cal->GetYaxis()->SetTitle("Events");
+  h_cross0_cal->GetYaxis()->SetLabelFont(42);
+  h_cross0_cal->GetYaxis()->SetTitleFont(42);
+  h_cross0_cal->GetYaxis()->SetTitleSize(0.04);
+  h_cross0_cal->GetYaxis()->CenterTitle(true);
   h_cross0_cal->Draw();
+
+  TLegend *legend_SAVE = new TLegend(0.25, 0.55, 0.75, 0.85);
+  legend_SAVE->SetBorderSize(0);
+  legend_SAVE->SetLineWidth(2);
+  legend_SAVE->SetTextSize(0.04);
+  legend_SAVE->AddEntry(h0_cal, "Light ouput of the centered module", "l");
+  legend_SAVE->AddEntry(h_cross0_cal, "Cross-talk to side module", "l");
+
+  legend_SAVE->Draw();
+
+  TCanvas* c_alpha_amp = new TCanvas("c_alpha_amp", "c_alpha_amp", 1100, 1000);
+  h_alpha_amplitude->SetTitle("");
+  h_alpha_amplitude->SetLineWidth(2);
+  h_alpha_amplitude->SetLineColor(kBlack);
+  h_alpha_amplitude->SetStats(0);
+  h_alpha_amplitude->GetXaxis()->SetTitle("Channel");
+  h_alpha_amplitude->GetXaxis()->SetLabelFont(42);
+  h_alpha_amplitude->GetXaxis()->SetTitleFont(42);
+  h_alpha_amplitude->GetXaxis()->SetTitleSize(0.04);
+  h_alpha_amplitude->GetXaxis()->CenterTitle(true);
+  h_alpha_amplitude->GetYaxis()->SetTitle("Events");
+  h_alpha_amplitude->GetYaxis()->SetLabelFont(42);
+  h_alpha_amplitude->GetYaxis()->SetTitleFont(42);
+  h_alpha_amplitude->GetYaxis()->SetTitleSize(0.04);
+  h_alpha_amplitude->GetYaxis()->CenterTitle(true);
+  h_alpha_amplitude->Draw();
 
   std::cout << "\ntime: " << timer->RealTime() << " (s)\n";
 }

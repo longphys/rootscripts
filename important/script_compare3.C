@@ -15,8 +15,8 @@
 //! histogram options
 double xminSim = 0.;
 double xmaxSim = 1.3;
-double xminExp = 0.;
-double xmaxExp = 20000.;
+double xminExp = 100.;
+double xmaxExp = 1500.;
 int binSim = (xmaxSim-xminSim)*1000.;
 int binExp = xmaxExp-xminExp;
 
@@ -37,8 +37,8 @@ int minRangeNa22 = 400; int maxRangeNa22 = 1500;
 
 //! FFT Threshold FOR INITIAL VALUES (30-1500)
 //? To increase FFT effect, lower the threshold
-int inithreshCs137 = 50.;
-int inithreshNa22 = 40.; 
+int inithreshCs137 = 100.;
+int inithreshNa22 = 100.; 
 
 //! SIMULATION AND MEASUREMENT FILES
 TFile* fsimCs137 = new TFile("../../simfiles/withAl_simCs137_1.root", "read");
@@ -89,7 +89,7 @@ double dSig2 = 5.5;
 //! SCALING
 //? ch0_9803_ch1_9842_ch2_9854
 double ScaleCs137[3] = {8.5, 8.5, 10.7};
-double ScaleNa22[3] = {3.3, 3.6, 3.4};
+double ScaleNa22[3] = {3.4, 3.6, 3.4};
 
 const char* TH1namechar;
 const char* TH1titlechar;
@@ -200,7 +200,7 @@ TH1D* Diff(TH1D* hChannel, std::string TH1name, std::string TH1title, int bin, d
 }
 
 double chi2(TH1D* hChannel1, TH1D* hChannel2){
-  double chi2Result = abs(hChannel1->Chi2Test(hChannel2, "UU CHI2/NDF") - 1);
+  double chi2Result = hChannel1->Chi2Test(hChannel2, "UU CHI2/NDF");
   return chi2Result;
 }
 
@@ -307,9 +307,9 @@ void script_compare3()
 
     int de_sizeCsFFT = (int)deCs137->size(); //! Neutron Calibration
     double *de_dataCsFFT = deCs137->data();
-    if(de_dataCsFFT[channel]>5.){
+    // if(de_dataCsFFT[channel]>5.){
     hExpCs137->Fill(de_dataCsFFT[channel]); 
-    }
+    // }
   }
   
   TH1D* hExpCs137Filtered = fft(hExpCs137, 0.1, inithreshCs137, "hExpCs137Filtered", "Cs137 Spectrum Filtered", binExp, xminExp, xmaxExp);
@@ -324,9 +324,9 @@ void script_compare3()
 
     int de_sizeNaFFT = (int)deNa22->size(); //! Neutron Calibration
     double *de_dataNaFFT = deNa22->data();
-    if(de_sizeNaFFT>5.){
+    // if(de_dataNaFFT[channel]>5.){
       hExpNa22->Fill(de_dataNaFFT[channel]); 
-    }
+    // }
   }
 
   for(int i = 0; i<5; i++){
@@ -368,6 +368,12 @@ void script_compare3()
   
   TRandom3* ranGen = new TRandom3();
 
+
+  TCanvas* cShow_SAVE = new TCanvas("cShow_SAVE", "cShow_SAVE", 1200, 1000);
+  cShow_SAVE->SetLeftMargin(0.15);
+  cShow_SAVE->SetTicks();
+  cShow_SAVE->SetGrid();
+
   TCanvas* cShow = new TCanvas("cShow", "Compare Spectrum", 1800, 1000);
   cShow->Divide(2,2);
   cShow->cd(1)->SetLeftMargin(0.15);
@@ -385,8 +391,8 @@ void script_compare3()
   double deltaChi2 = 1000000.;
   double deltaChi2_1 = 0., deltaChi2_2 = 0., deltaChi2_3 = 0.;
 
-  double thresh = 0.2;
-  double chi2limit = 0.1;
+  double thresh = 0.3;
+  double chi2limit = 0.5;
   int count = 1;
 
   TCanvas* results = new TCanvas("Preliminary results", "Preliminary results", 1500, 500);
@@ -578,11 +584,11 @@ void script_compare3()
     chi2_Na22 = chi2(hcalNa22Filtered, hsimNa22resFiltered);
     std::cout << "~~~~~~~~~~~CHECK~~~~~~~~~~~~\n";
 
-    grChi2_Cs137->SetTitle("|Reduced #chi^{2} - 1| by iteration ({}^{137}Cs)");
+    grChi2_Cs137->SetTitle("#chi^{2} distance by iteration for {}^{137}Cs");
     cShow->cd(1)->SetTicks();
     cShow->cd(1)->SetGrid();
     grChi2_Cs137->GetXaxis()->SetTitle("Iteration");
-    grChi2_Cs137->GetYaxis()->SetTitle("|r-#chi^{2} - 1|");
+    grChi2_Cs137->GetYaxis()->SetTitle("#chi^{2} distance");
 
     grChi2_Cs137->SetStats(0);
     grChi2_Cs137->SetLineColor(kBlack);
@@ -600,11 +606,11 @@ void script_compare3()
 
     grChi2_Cs137->AddPoint(count, chi2_Cs137);
 
-    grChi2_Na22->SetTitle("|Reduced #chi^{2} - 1| by iteration ({}^{22}Na)");
+    grChi2_Na22->SetTitle("#chi^{2} distance by iteration for {}^{22}Na");
     cShow->cd(2)->SetTicks();
     cShow->cd(2)->SetGrid();
     grChi2_Na22->GetXaxis()->SetTitle("Iteration");
-    grChi2_Na22->GetYaxis()->SetTitle("|r-#chi^{2} - 1|");
+    grChi2_Na22->GetYaxis()->SetTitle("#chi^{2} distance");
 
     grChi2_Na22->SetStats(0);
     grChi2_Na22->SetLineColor(kBlack);
@@ -691,7 +697,8 @@ void script_compare3()
     hcalCs137Filtered->GetYaxis()->SetTitle("Events");
 
     hcalCs137Filtered->SetStats(0);
-    hcalCs137Filtered->SetLineWidth(1);
+    hcalCs137Filtered->SetLineWidth(2);
+    hsimCs137resFiltered->SetLineWidth(2);
 
     hcalCs137Filtered->GetXaxis()->SetLabelFont(42);
     hcalCs137Filtered->GetXaxis()->SetTitleFont(52);
@@ -726,7 +733,8 @@ void script_compare3()
     hcalNa22Filtered->GetYaxis()->SetTitle("Events");
 
     hcalNa22Filtered->SetStats(0);
-    hcalNa22Filtered->SetLineWidth(1);
+    hcalNa22Filtered->SetLineWidth(2);
+    hsimNa22resFiltered->SetLineWidth(2);
 
     hcalNa22Filtered->GetXaxis()->SetLabelFont(42);
     hcalNa22Filtered->GetXaxis()->SetTitleFont(52);
@@ -822,6 +830,25 @@ void script_compare3()
     cShow->cd();
     // cShow->Print("script_compare3_final3.gif+50");
     
+    if (count == 1){
+      // cShow_SAVE->cd();
+      // hcalNa22Filtered->Draw();
+      // hsimNa22resFiltered->Draw("same");
+      // cShow_SAVE->Modified();
+      // cShow_SAVE->Update();
+
+      // TLegend *legend_SAVE = new TLegend(0.45, 0.55, 0.75, 0.85);
+      // legend_SAVE->SetBorderSize(0);
+      // legend_SAVE->SetLineWidth(2);
+      // legend_SAVE->SetTextSize(0.05);
+      // legend_SAVE->AddEntry(hcalNa22Filtered, "{}^{22}Na Measurement", "l");
+      // legend_SAVE->AddEntry(hsimNa22resFiltered, "{}^{22}Na Simulation", "l");
+
+      // legend_SAVE->Draw();
+
+      // cShow_SAVE->Print("Na22_firstfit.png");
+    }
+
     if(count > 1){
       if (chi2_Cs137 < chi2limit){
         tuningRateCh1 = 0.;
@@ -872,7 +899,21 @@ void script_compare3()
       delete hsimNa22resUpSig2Filtered;
 
     }
-    else{}
+    else{
+      cShow_SAVE->cd();
+      // hcalNa22Filtered->Draw();
+      // hsimNa22resFiltered->Draw("same");
+      // cShow_SAVE->Modified();
+      // cShow_SAVE->Update();
+
+      // cShow_SAVE->Print("Na22_lastfit.png");
+      
+      grChi2_Na22->Draw();
+
+      cShow_SAVE->Modified();
+      cShow_SAVE->Update();
+      cShow_SAVE->Print("chi2_descent_Na22.png");
+    }
 
     count++;
   } 
