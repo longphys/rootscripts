@@ -37,8 +37,8 @@ int minRangeNa22 = 400; int maxRangeNa22 = 1500;
 
 //! FFT Threshold FOR INITIAL VALUES (30-1500)
 //? To increase FFT effect, lower the threshold
-int inithreshCs137 = 100.;
-int inithreshNa22 = 100.; 
+int inithreshCs137 = 50.;
+int inithreshNa22 = 50.; 
 
 //! SIMULATION AND MEASUREMENT FILES
 TFile* fsimCs137 = new TFile("../../simfiles/withAl_simCs137_1.root", "read");
