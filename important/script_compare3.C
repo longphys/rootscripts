@@ -828,7 +828,7 @@ void script_compare3()
     cShow1->cd(8)->Update();
 
     cShow->cd();
-    // cShow->Print("script_compare3_final3.gif+50");
+    cShow->Print("script_compare3_final4.gif+100");
     
     if (count == 1){
       // cShow_SAVE->cd();

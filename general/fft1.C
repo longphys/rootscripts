@@ -12,6 +12,7 @@
 #include "TGraph.h"
 #include "TMarker.h"
 #include "TLegend.h"
+#include "TLine.h"
 
 //! Range of experimental Cs137 and Na22 histograms (Bins)
 double xminExp = 100;
@@ -19,6 +20,7 @@ double xmaxExp = 800;
 int binExp = xmaxExp-xminExp;
 
 //! Threshold parameters
+// double para_k1 = 0.1;
 double para_k1 = 0.1;
 double para_c1 = 100.0;
 
@@ -416,6 +418,7 @@ void fft1()
 
   TCanvas* CanvasFilter = new TCanvas("CanvasFilter", "CanvasFilter", 800, 600);
   CanvasFilter->cd()->SetLogy();
+  CanvasFilter->cd()->SetLogx();
   CanvasFilter->cd()->SetTicks();
   hm1->Draw();
 
@@ -436,7 +439,7 @@ void fft1()
   hm1->GetYaxis()->SetTitleSize(0.04);
   hm1->GetYaxis()->CenterTitle(true);
 
-  // hLogis1->Scale(10000, "noSW2");
+  // hLogis1->Scale(300000, "noSW2");
   hLogis1->Draw("same");
 
   TLegend *legend = new TLegend(0.4, 0.55, 0.8, 0.85);
@@ -444,7 +447,7 @@ void fft1()
   legend->SetLineWidth(2);
   legend->SetTextSize(0.06);
   legend->AddEntry(hm1, "Fourier image magnitude", "l");
-  legend->AddEntry(hLogis1, "Logistics function", "l");
+  legend->AddEntry(hLogis1, "Logistic function", "l");
 
   legend->Draw();
 
@@ -462,6 +465,7 @@ void fft1()
   {
     re_full1[i] = re_full1[i]*hLogis1->GetBinContent(i);
     im_full1[i] = im_full1[i]*hLogis1->GetBinContent(i);
+    // im_full1[i] = im_full1[i];
   }
 
   //Now let's make a backward transform:
@@ -471,6 +475,7 @@ void fft1()
   TH1 *hb1 = nullptr;
   //Let's look at the output
   hb1 = TH1::TransformHisto(fft_back1,hb1,"RE");
+  // hb1 = TH1::TransformHisto(fft_back1,hb1,"MAG");
 
   TH1D* newhb1 = new TH1D("newhb1", "newhb1", binExpEven, -(xmaxExp - xminExp), xmaxExp - xminExp);
   for(int i = 1; i <= binExpEven; i++)
@@ -579,8 +584,8 @@ void fft1()
   hChannel1->SetTitle("");
   hChannel1->SetLineColor(kBlue);
   hChannel1->SetStats(0);
-  hChannel1->GetXaxis()->SetRangeUser(100., 500.);
-  hChannel1->GetYaxis()->SetRangeUser(0.,1000.);
+  // hChannel1->GetXaxis()->SetRangeUser(100., 500.);
+  hChannel1->GetYaxis()->SetRangeUser(0.,1500.);
 
   hChannel1->GetXaxis()->SetTitle("Channel");
   hChannel1->GetXaxis()->SetLabelFont(42);
@@ -603,8 +608,8 @@ void fft1()
   hFiltered1->SetLineWidth(3);
   hFiltered1->SetTitle("");
   hFiltered1->SetStats(0);
-  hFiltered1->GetXaxis()->SetRangeUser(100., 500.);
-  hFiltered1->GetYaxis()->SetRangeUser(0.,1000.);
+  // hFiltered1->GetXaxis()->SetRangeUser(100., 500.);
+  hFiltered1->GetYaxis()->SetRangeUser(0.,1500.);
 
   hFiltered1->GetXaxis()->SetTitle("Channel");
   hFiltered1->GetXaxis()->SetLabelFont(42);
@@ -618,10 +623,10 @@ void fft1()
   hFiltered1->GetYaxis()->SetTitleSize(0.04);
   hFiltered1->GetYaxis()->CenterTitle(true);
 
-  TLegend *legend2 = new TLegend(0.55, 0.55, 0.85, 0.85);
+  TLegend *legend2 = new TLegend(0.45, 0.45, 0.8, 0.8);
   legend2->SetBorderSize(0);
   legend2->SetLineWidth(2);
-  legend2->SetTextSize(0.03);
+  legend2->SetTextSize(0.04);
   legend2->AddEntry(hChannel1, "Sample {}^{137}Cs Spectrum", "l");
   legend2->AddEntry(hFiltered1, "Filtered {}^{137}Cs Spectrum", "l");
 
@@ -662,12 +667,12 @@ void fft1()
 
   //! RESULT CANVAS
   TCanvas* CanvasDiff = new TCanvas("CanvasDiff", "CanvasDiff", 1200, 1000);
+
   CanvasDiff->cd()->SetTicks();
   CanvasDiff->cd()->SetGrid();
   CanvasDiff->cd()->SetLeftMargin(0.15);
   hFilDiff5Channel1->Draw();
-  hFilDiff5Channel1->GetYaxis()->SetRangeUser(-40, 100);
-  hFiltered1->Scale(0.1, "noSW2");
+  // hFiltered1->Scale(0.1, "noSW2");
 
   hFiltered1->SetLineColor(kBlack);
   hFiltered1->SetLineWidth(5);
@@ -677,7 +682,6 @@ void fft1()
   hFilDiff5Channel1->SetTitle("");
   hFilDiff5Channel1->SetLineColor(kRed);
   hFilDiff5Channel1->SetStats(0);
-  hFilDiff5Channel1->GetXaxis()->SetRangeUser(100., 500.);
 
   hFilDiff5Channel1->GetXaxis()->SetTitle("Channel");
   hFilDiff5Channel1->GetXaxis()->SetLabelFont(42);
@@ -687,12 +691,18 @@ void fft1()
 
   TLegend *legendDiff = new TLegend(0.55, 0.55, 0.85, 0.85);
   legendDiff->SetBorderSize(0);
-  legendDiff->SetLineWidth(2);
+  legendDiff->SetLineWidth(3);
   legendDiff->SetTextSize(0.03);
   legendDiff->AddEntry(hFiltered1, "Filtered {}^{137}Cs Spectrum", "l");
   legendDiff->AddEntry(hFilDiff5Channel1, "Corresponding first derivative", "l");
 
   legendDiff->Draw();
+
+  TLine* dotted_line = new TLine(496, -5.5, 496, 15);
+  dotted_line->SetLineColor(kRed);
+  dotted_line->SetLineStyle(9);
+  dotted_line->SetLineWidth(2);
+  dotted_line->Draw();
 
   canvas3->cd(2);
   canvas3->cd(2)->SetGridx();

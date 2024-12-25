@@ -23,7 +23,7 @@ void chi2_2par_1(){
   }
 
   double sigma;
-  double sigmaMin = 0.00;
+  double sigmaMin = 0.0;
   double sigmaMax = 2.00;
   double sigmaStep = 0.05;
   int sigmaTimes = (sigmaMax - sigmaMin)/sigmaStep + 1;

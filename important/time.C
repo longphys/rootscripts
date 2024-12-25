@@ -84,8 +84,8 @@ double CalScaleCo60[3] = {1., 1., 1.};
 // double CalScaleCo60[3] = {1.05, 1., 2.4};
 
 //! energy range to analyze timing resolution (MeV)
-double min_time = 0.9;
-double max_time = 1.1;
+double min_time = 0.25;
+double max_time = 0.35;
 
 //! Channels
 int channel[3] = {0, 1, 2};
@@ -331,37 +331,55 @@ void time()
   chExpCo60->Draw("NeEvent.neutTDC[0]-NeEvent.neutTDC[1]>>hTime1", prompt0_full, "");
   hTime1->Fit("fGaus", "", "", -200., 200.);
   double timeResCh[3];
+  double timeResCh_error[3];
   timeResCh[0] = fGaus->GetParameter(2);
+  timeResCh_error[0] = fGaus->GetParError(2);
+	std::cout << "timeResCh[0] = " << timeResCh[0] << "\n";
+	std::cout << "timeResCh_error[0] = " << timeResCh_error[0] << "\n";
 
   c2->cd(2);
   chExpCo60->Draw("NeEvent.neutTDC[1]-NeEvent.neutTDC[2]>>hTime2", prompt1_full, "");
   hTime2->Fit("fGaus", "", "", -200., 200.);
   timeResCh[1] = fGaus->GetParameter(2);
+  timeResCh_error[1] = fGaus->GetParError(2);
+	std::cout << "timeResCh[1] = " << timeResCh[1] << "\n";
+	std::cout << "timeResCh_error[1] = " << timeResCh_error[1] << "\n";
 
   c2->cd(3);
   chExpCo60->Draw("NeEvent.neutTDC[2]-NeEvent.neutTDC[0]>>hTime3", prompt2_full, "");
   hTime3->Fit("fGaus", "", "", -200., 200.);
   timeResCh[2] = fGaus->GetParameter(2);
+  timeResCh_error[2] = fGaus->GetParError(2);
+	std::cout << "timeResCh[2] = " << timeResCh[2] << "\n";
+	std::cout << "timeResCh_error[2] = " << timeResCh_error[2] << "\n";
 
   std::cout << "Time resolution 0 - 1 = " << timeResCh[0]*31.25 << "(ps)\n";
   std::cout << "Time resolution 1 - 2 = " << timeResCh[1]*31.25 << "(ps)\n";
   std::cout << "Time resolution 2 - 0 = " << timeResCh[2]*31.25 << "(ps)\n";
 
-  double A = pow(timeResCh[0]*31.25,2);
-  double B = pow(timeResCh[1]*31.25,2);
-  double C = pow(timeResCh[2]*31.25,2);
+  double A = timeResCh[0];
+  double B = timeResCh[1];
+  double C = timeResCh[2];
 
-  double x = (A-B+C)/2;
-  double z = C-x;
-  double y = B-z;
+	double A_err = timeResCh_error[0];
+	double B_err = timeResCh_error[1];
+	double C_err = timeResCh_error[2];
 
-  double timeRes0 = sqrt(x);
-  double timeRes1 = sqrt(y);
-  double timeRes2 = sqrt(z);
+  double x = (A*A+B*B-C*C)/2;
+  double z = (A*A-B*B+C*C)/2;
+  double y = (-A*A+B*B+C*C)/2;
 
-  std::cout << "Time resolution Channel 0 = " << timeRes0 << "(ps)\n";
-  std::cout << "Time resolution Channel 1 = " << timeRes1 << "(ps)\n";
-  std::cout << "Time resolution Channel 2 = " << timeRes2 << "(ps)\n";
+  double timeRes0 = 31.25*sqrt(x);
+  double timeRes1 = 31.25*sqrt(y);
+  double timeRes2 = 31.25*sqrt(z);
+  
+  double timeRes0_error = 31.25*sqrt( ((A*A)/(x*x)) * (A_err*A_err) + ((B*B)/(x*x)) * (B_err*B_err) + ((C*C)/(x*x)) * (C_err*C_err) );
+  double timeRes1_error = 31.25*sqrt( ((A*A)/(y*y)) * (A_err*A_err) + ((B*B)/(y*y)) * (B_err*B_err) + ((C*C)/(y*y)) * (C_err*C_err) );
+  double timeRes2_error = 31.25*sqrt( ((A*A)/(z*z)) * (A_err*A_err) + ((B*B)/(z*z)) * (B_err*B_err) + ((C*C)/(z*z)) * (C_err*C_err) );
+
+  std::cout << "Time resolution Channel 0 = " << timeRes0 << "(ps); error = " << timeRes0_error << "(ps)\n";
+  std::cout << "Time resolution Channel 1 = " << timeRes1 << "(ps); error = " << timeRes1_error << "(ps)\n";
+  std::cout << "Time resolution Channel 2 = " << timeRes2 << "(ps); error = " << timeRes2_error << "(ps)\n";
 
   std::cout << "Energy resolution at 1MeV Channel 0 = " << 
   sqrt( pow(coA[0],2) + pow(coB[0]/sqrt(1.0),2) + pow(coC[0]/1.0,2) )*100 << "(%)\n";
