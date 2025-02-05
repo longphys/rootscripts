@@ -16,7 +16,7 @@
 double xminSim = 0.;
 double xmaxSim = 1.3;
 double xminExp = 100.;
-double xmaxExp = 1500.;
+double xmaxExp = 1000.;
 int binSim = (xmaxSim-xminSim)*1000.;
 int binExp = xmaxExp-xminExp;
 
@@ -31,29 +31,19 @@ double maxTestNa22 = 1.3;
 
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //! ZOOM FOR FFT
-int minRangeCs137 = 200; int maxRangeCs137 = 1500;
-int minRangeNa22 = 400; int maxRangeNa22 = 1500;
-// int minRangeCo60 = 300; int maxRangeCo60 = 1500;
+int minRangeCs137 = 200; int maxRangeCs137 = xmaxExp;
+int minRangeNa22 = 400; int maxRangeNa22 = xmaxExp;
 
-//! FFT Threshold FOR INITIAL VALUES (30-1500)
-//? To increase FFT effect, lower the threshold
+//! FFT Threshold FOR INITIAL VALUES (30-1000)
 int inithreshCs137 = 50.;
 int inithreshNa22 = 50.; 
 
 //! SIMULATION AND MEASUREMENT FILES
-TFile* fsimCs137 = new TFile("../../simfiles/withAl_simCs137_1.root", "read");
-// TFile* fexpCs137 = new TFile("./expfiles/time/4/plastic_detectors_Cs137_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
-// TFile* fexpCs137 = new TFile("./expfiles/time/5/plastic_detectors_Cs137_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
+TFile* fsimCs137 = new TFile("~/data/simfiles/withAl_simCs137_1.root", "read");
+TFile* fexpCs137 = new TFile("~/data/expfiles/time/4/plastic_detectors_Cs137_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
 
-TFile* fsimNa22 = new TFile("../../simfiles/withAl_simNa22_1.root", "read");
-// TFile* fexpNa22 = new TFile("./expfiles/time/4/plastic_detectors_Na22_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
-// TFile* fexpNa22 = new TFile("./expfiles/time/5/plastic_detectors_Na22_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root", "read");
-
-//!Neutron measurement calibration
-TFile* fexpCs137 = new TFile("../../EfficiencyPlasticFLNR/declib/output/test12_2_Plast_BC404_Cs137.root","read");
-TFile* fexpNa22 = new TFile("../../EfficiencyPlasticFLNR/declib/output/test13_2_Plast_BC404_Na22.root", "read");
-std::vector <double> *deCs137 = nullptr;
-std::vector <double> *deNa22 = nullptr;
+TFile* fsimNa22 = new TFile("~/data/simfiles/withAl_simNa22_1.root", "read");
+TFile* fexpNa22 = new TFile("~/data/expfiles/time/4/plastic_detectors_Na22_ch0HV1787_ch1HV1821_ch2HV1850_ch0_9849_ch1_9759_ch2_9825_run_0_0001.root", "read");
 
 //! CHANNEL CHANGE
 int channel = 0;
@@ -74,20 +64,17 @@ double threshSim = 800.;
 //? To increase the speed of gradient descent, increase the tuning rate
 //? Ch rates are for energy calibration changes, Sig rates are for energy resolution changes
 
-double tuningRateCh1 = 2.;
-double tuningRateCh2 = 20.;
-double tuningRateSig1 = 0.05;
-double tuningRateSig2 = 0.05;
+double learningRateCh1 = 2.;
+double learningRateCh2 = 20.;
+double learningRateSig1 = 0.05;
+double learningRateSig2 = 0.05;
 //!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//! RESOLUTION
+//! RESOLUTION(%)
 double dSig1 = 8.;
 double dSig2 = 5.5;
-// double dSig3 = 5.;
-//? In percentage
 
 //! SCALING
-//? ch0_9803_ch1_9842_ch2_9854
 double ScaleCs137[3] = {8.5, 8.5, 10.7};
 double ScaleNa22[3] = {3.4, 3.6, 3.4};
 
@@ -238,7 +225,7 @@ double fitRes(double Sig1, double Sig2, TH1D* hCs137, TH1D* hNa22, double xmin, 
   //! Choose fit function
   TF1* fRes = new TF1("fRes", "sqrt([0]*[0] + [1]*[1]/(x*x))");
   canvasFit->cd(2);
-  hRes->Fit("fRes", "Q", "", E1-0.2, E2+0.3);
+  hRes->Fit("fRes", "Q", "", E1-0.1, E2+0.1);
 
   //! Correspond to chosen function
   double EnergyCoA = std::abs(fRes->GetParameter(0));
@@ -256,7 +243,7 @@ double fitRes(double Sig1, double Sig2, TH1D* hCs137, TH1D* hNa22, double xmin, 
   else{return EnergyCoC;}
 }
 
-void script_compare3()
+void script_compare4()
 {
   TCanvas* cFit = new TCanvas("cFit", "cFit", 1000, 500);
   cFit->Divide(2,1);
@@ -266,14 +253,10 @@ void script_compare3()
 
   //! Files and trees
   TTree* tsimCs137 = (TTree*) fsimCs137->Get("dEEtree");
-  // TTree* texpCs137 = (TTree*) fexpCs137->Get("AnalysisxTree");
-
-  //! Neutron Calibration
-  TTree* texpCs137 = (TTree*)fexpCs137->Get("ETree");
-  texpCs137->SetBranchAddress("EDep", &deCs137);
+  TTree* texpCs137 = (TTree*) fexpCs137->Get("AnalysisxTree");
 
   UShort_t chX[48];
-  // texpCs137->SetBranchAddress("NeEvent.neutAmp[48]", chX);
+  texpCs137->SetBranchAddress("NeEvent.neutAmp[48]", chX);
   // Long64_t entriesExpCs137 = texpCs137->GetEntries();
   Long64_t entriesExpCs137 = entriesExp;
 
@@ -283,14 +266,10 @@ void script_compare3()
   Long64_t entriesSimCs137 = entriesSim;
 
   TTree* tsimNa22 =  (TTree*) fsimNa22->Get("dEEtree");
-  // TTree* texpNa22 =  (TTree*) fexpNa22->Get("AnalysisxTree");
-
-  //! Neutron Calibration
-  TTree* texpNa22 = (TTree*)fexpNa22->Get("ETree");
-  texpNa22->SetBranchAddress("EDep", &deNa22);
+  TTree* texpNa22 =  (TTree*) fexpNa22->Get("AnalysisxTree");
 
   UShort_t chY[48];
-  // texpNa22->SetBranchAddress("NeEvent.neutAmp[48]", chY);
+  texpNa22->SetBranchAddress("NeEvent.neutAmp[48]", chY);
   // Long64_t entriesExpNa22 = texpNa22->GetEntries();
   Long64_t entriesExpNa22 = entriesExp;
 
@@ -305,13 +284,7 @@ void script_compare3()
 
   for(int i = 0; i < 100000; i++){
     texpCs137->GetEntry(i);
-    // hExpCs137->Fill(chX[channel]);
-
-    int de_sizeCsFFT = (int)deCs137->size(); //! Neutron Calibration
-    double *de_dataCsFFT = deCs137->data();
-    // if(de_dataCsFFT[channel]>5.){
-    hExpCs137->Fill(de_dataCsFFT[channel]); 
-    // }
+    hExpCs137->Fill(chX[channel]);
   }
   
   TH1D* hExpCs137Filtered = fft(hExpCs137, 0.1, inithreshCs137, "hExpCs137Filtered", "Cs137 Spectrum Filtered", binExp, xminExp, xmaxExp);
@@ -319,16 +292,9 @@ void script_compare3()
   hExpCs137Filtered->GetYaxis()->SetTitle("Count");
   TH1D* hExpCs137Diff = Diff(hExpCs137Filtered, "hExpCs137Diff", "Cs137 Spectrum Derivative", binExp, xminExp, xmaxExp);
 
-  // std::cout << "~~~~~~~~~TEST~~~~~~~~~~~\n";
   for(int i = 0; i < 100000; i++){
     texpNa22->GetEntry(i);
-    // hExpNa22->Fill(chY[channel]);
-
-    int de_sizeNaFFT = (int)deNa22->size(); //! Neutron Calibration
-    double *de_dataNaFFT = deNa22->data();
-    // if(de_dataNaFFT[channel]>5.){
-      hExpNa22->Fill(de_dataNaFFT[channel]); 
-    // }
+    hExpNa22->Fill(chY[channel]);
   }
 
   for(int i = 0; i<5; i++){
@@ -370,12 +336,6 @@ void script_compare3()
   
   TRandom3* ranGen = new TRandom3();
 
-
-  TCanvas* cShow_SAVE = new TCanvas("cShow_SAVE", "cShow_SAVE", 1200, 1000);
-  cShow_SAVE->SetLeftMargin(0.15);
-  cShow_SAVE->SetTicks();
-  cShow_SAVE->SetGrid();
-
   TCanvas* cShow = new TCanvas("cShow", "Compare Spectrum", 1800, 1000);
   cShow->Divide(2,2);
   cShow->cd(1)->SetLeftMargin(0.15);
@@ -396,9 +356,6 @@ void script_compare3()
   double thresh = 0.3;
   double chi2limit = 0.5;
   int count = 1;
-
-  TCanvas* results = new TCanvas("Preliminary results", "Preliminary results", 1500, 500);
-  results->Divide(3,1);
 
   while (deltaChi2>thresh){
     //! Energy Calibration
@@ -453,15 +410,9 @@ void script_compare3()
     //! Fill experiment histograms (Cs137)
     for(int i = 0; i < entriesExpCs137; i++){
       texpCs137->GetEntry(i);
-      // hcalCs137->Fill(a*(chX[channel]+0.5) + b);
-      // hcalCs137UpCh1->Fill(aUpCh1*(chX[channel]+0.5) + bUpCh1);
-      // hcalCs137UpCh2->Fill(aUpCh2*(chX[channel]+0.5) + bUpCh2);
-
-      int de_sizeCs137 = (int)deCs137->size(); //! Neutron Calibration
-      double *de_dataCs137 = deCs137->data();
-      hcalCs137->Fill(a*(de_dataCs137[channel]+0.5) + b);
-      hcalCs137UpCh1->Fill(aUpCh1*(de_dataCs137[channel]+0.5) + bUpCh1);
-      hcalCs137UpCh2->Fill(aUpCh2*(de_dataCs137[channel]+0.5) + bUpCh2); 
+      hcalCs137->Fill(a*(chX[channel]+0.5) + b);
+      hcalCs137UpCh1->Fill(aUpCh1*(chX[channel]+0.5) + bUpCh1);
+      hcalCs137UpCh2->Fill(aUpCh2*(chX[channel]+0.5) + bUpCh2);
     }
     TH1D* hcalCs137Filtered = fft(hcalCs137, 0.1, threshExp, "hcalCs137Filtered", "hcalCs137Filtered", binExp, xminCal, xmaxCal);
     TH1D* hcalCs137UpCh1Filtered = fft(hcalCs137UpCh1, 0.1, threshExp, "hcalCs137UpCh1Filtered", "hcalCs137UpCh1Filtered", binExp, xminCalUpCh1, xmaxCalUpCh1);
@@ -473,12 +424,6 @@ void script_compare3()
       hcalNa22->Fill(a*(chY[channel]+0.5) + b);
       hcalNa22UpCh1->Fill(aUpCh1*(chY[channel]+0.5) + bUpCh1);
       hcalNa22UpCh2->Fill(aUpCh2*(chY[channel]+0.5) + bUpCh2);
-
-      int de_sizeNa22 = (int)deNa22->size(); //! Neutron Calibration
-      double *de_dataNa22 = deNa22->data();
-      hcalNa22->Fill(a*(de_dataNa22[channel]+0.5) + b);
-      hcalNa22UpCh1->Fill(aUpCh1*(de_dataNa22[channel]+0.5) + bUpCh1);
-      hcalNa22UpCh2->Fill(aUpCh2*(de_dataNa22[channel]+0.5) + bUpCh2); 
     }
     TH1D* hcalNa22Filtered = fft(hcalNa22, 0.1, threshExp, "hcalNa22Filtered", "hcalNa22Filtered", binExp, xminCal, xmaxCal);
     TH1D* hcalNa22UpCh1Filtered = fft(hcalNa22UpCh1, 0.1, threshExp, "hcalNa22UpCh1Filtered", "hcalNa22UpCh1Filtered", binExp, xminCalUpCh1, xmaxCalUpCh1);
@@ -577,11 +522,6 @@ void script_compare3()
     deltaChi2 = deltaChi2_1 + deltaChi2_2 + deltaChi2_3;
     }
 
-    std::cout << "\ndeltaChi2_1 = " << deltaChi2_1 
-    << "\ndeltaChi2_2 = " << deltaChi2_2
-    << "\ndeltaChi2_3 = " << deltaChi2_3
-    << "\nTotal deltaChi2 = " << deltaChi2 << "\n";
-
     chi2_Cs137 = chi2(hcalCs137Filtered, hsimCs137resFiltered);
     chi2_Na22 = chi2(hcalNa22Filtered, hsimNa22resFiltered);
     std::cout << "~~~~~~~~~~~CHECK~~~~~~~~~~~~\n";
@@ -640,7 +580,7 @@ void script_compare3()
     cShow->cd(2)->Modified();
     cShow->cd(2)->Update();
 
-    //! Gradient(Cs137)
+    //! Chi2(Cs137)
     hcalCs137UpCh1Filtered->GetXaxis()->SetRangeUser(minTestCs137, maxTestCs137);
     hsimCs137resUpCh1Filtered->GetXaxis()->SetRangeUser(minTestCs137, maxTestCs137);
     double chi2_Cs137_UpCh1 = chi2(hcalCs137UpCh1Filtered, hsimCs137resUpCh1Filtered);
@@ -655,7 +595,7 @@ void script_compare3()
     hsimCs137resUpSig2Filtered->GetXaxis()->SetRangeUser(minTestCs137, maxTestCs137);
     double chi2_Cs137_UpSig2 = chi2(hcalCs137Filtered, hsimCs137resUpSig2Filtered);
 
-    //! Gradient(Na22)
+    //! Chi2(Na22)
     hcalNa22UpCh1Filtered->GetXaxis()->SetRangeUser(minTestNa22, maxTestNa22);
     hsimNa22resUpCh1Filtered->GetXaxis()->SetRangeUser(minTestNa22, maxTestNa22);
     double chi2_Na22_UpCh1 = chi2(hcalNa22UpCh1Filtered, hsimNa22resUpCh1Filtered);
@@ -676,21 +616,27 @@ void script_compare3()
     double devChi2UpSig1 = ((chi2_Cs137_UpSig1+chi2_Na22_UpSig1)-(chi2_Cs137+chi2_Na22))/dSig1step;
     double devChi2UpSig2 = ((chi2_Cs137_UpSig2+chi2_Na22_UpSig2)-(chi2_Cs137+chi2_Na22))/dSig2step;
 
-    std::cout << "devChi2UpCh1 = " << devChi2UpCh1 << "; devChi2UpCh2 = " << devChi2UpCh2 
-    << "\ndevChi2UpSig1 = " << devChi2UpSig1 << "; devChi2UpSig2 = " << devChi2UpSig2 << "\n";
+    // std::cout << "devChi2UpCh1 = " << devChi2UpCh1 << "; devChi2UpCh2 = " << devChi2UpCh2 
+    // << "\ndevChi2UpSig1 = " << devChi2UpSig1 << "; devChi2UpSig2 = " << devChi2UpSig2 << "\n";
 
-    Ch1 = Ch1 - tuningRateCh1*devChi2UpCh1;
-    Ch2 = Ch2 - tuningRateCh2*devChi2UpCh2;
+		//! Moving along the gradient
+    Ch1 = Ch1 - learningRateCh1*devChi2UpCh1;
+    Ch2 = Ch2 - learningRateCh2*devChi2UpCh2;
 
-    dSig1 = dSig1 - tuningRateSig1*devChi2UpSig1;
-    dSig2 = dSig2 - tuningRateSig2*devChi2UpSig2;
+    dSig1 = dSig1 - learningRateSig1*devChi2UpSig1;
+    dSig2 = dSig2 - learningRateSig2*devChi2UpSig2;
 
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    std::cout << "Ch1 = " << Ch1 << "; Ch2 = " << Ch2 
-    << "\nSig1 = " << dSig1 << "; Sig2 = " << dSig2 << "\n";
+    // std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    // std::cout << "Ch1 = " << Ch1 << "; Ch2 = " << Ch2 
+    // << "\nSig1 = " << dSig1 << "; Sig2 = " << dSig2 << "\n";
 
     double energy_resolution_at_1MeV = sqrt( pow(coA,2.) + std::pow((coC/1.),2.) ) / 1;
     std::cout << "E_resolution at 1MeV = " << energy_resolution_at_1MeV*100. << " (%)\n";
+
+    std::cout << "\ndeltaChi2_1 = " << deltaChi2_1 
+    << "\ndeltaChi2_2 = " << deltaChi2_2
+    << "\ndeltaChi2_3 = " << deltaChi2_3
+    << "\nTotal deltaChi2 = " << deltaChi2 << "\n";
 
     cShow->cd(3);
     cShow->cd(3)->SetTicks();
@@ -829,37 +775,15 @@ void script_compare3()
     cShow1->cd(8)->Modified();
     cShow1->cd(8)->Update();
 
-    cShow->cd();
-    cShow->Print("script_compare3_final4.gif+100");
-    
-    if (count == 1){
-      // cShow_SAVE->cd();
-      // hcalNa22Filtered->Draw();
-      // hsimNa22resFiltered->Draw("same");
-      // cShow_SAVE->Modified();
-      // cShow_SAVE->Update();
-
-      // TLegend *legend_SAVE = new TLegend(0.45, 0.55, 0.75, 0.85);
-      // legend_SAVE->SetBorderSize(0);
-      // legend_SAVE->SetLineWidth(2);
-      // legend_SAVE->SetTextSize(0.05);
-      // legend_SAVE->AddEntry(hcalNa22Filtered, "{}^{22}Na Measurement", "l");
-      // legend_SAVE->AddEntry(hsimNa22resFiltered, "{}^{22}Na Simulation", "l");
-
-      // legend_SAVE->Draw();
-
-      // cShow_SAVE->Print("Na22_firstfit.png");
-    }
-
     if(count > 1){
       if (chi2_Cs137 < chi2limit){
-        tuningRateCh1 = 0.;
-        tuningRateSig1 = 0.;
+        learningRateCh1 = 0.;
+        learningRateSig1 = 0.;
       }
 
       if (chi2_Na22 < chi2limit){
-        tuningRateCh2 = 0.;
-        tuningRateSig2 = 0.;
+        learningRateCh2 = 0.;
+        learningRateSig2 = 0.;
       }
     }
 
@@ -901,21 +825,7 @@ void script_compare3()
       delete hsimNa22resUpSig2Filtered;
 
     }
-    else{
-      cShow_SAVE->cd();
-      // hcalNa22Filtered->Draw();
-      // hsimNa22resFiltered->Draw("same");
-      // cShow_SAVE->Modified();
-      // cShow_SAVE->Update();
-
-      // cShow_SAVE->Print("Na22_lastfit.png");
-      
-      grChi2_Na22->Draw();
-
-      cShow_SAVE->Modified();
-      cShow_SAVE->Update();
-      cShow_SAVE->Print("chi2_descent_Na22.png");
-    }
+    else{}
 
     count++;
   } 

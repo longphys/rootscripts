@@ -181,7 +181,8 @@ void readNeutron()
   // TFile* fsim = new TFile("../../simfiles/neutron/eff_1.45_birk_207.root", "read");
   // TFile* fsim = new TFile("../../simfiles/neutron/eff_0.95_birk_088.root", "read");
   // TFile* fsim = new TFile("../../simfiles/neutron/eff_0.8_birk_0486.root", "read");
-  TFile* fsim = new TFile("../../simfiles/neutron/conference_file.root", "read");
+  // TFile* fsim = new TFile("../../simfiles/neutron/conference_file.root", "read");
+  TFile* fsim = new TFile("../../simfiles/neutron/out.root", "read");
   // TFile* fsim = new TFile("../../simfiles/neutron/test.root", "read");
   // TFile* fsim = new TFile("../../simfiles/neutron/test1.root", "read");
   // TFile* fsim = new TFile("../../../software/geant4/geant4build/sim/build/out.root", "read");
@@ -206,7 +207,7 @@ void readNeutron()
   
   Long64_t entries_exp = texp->GetEntries();
   // entries_exp = 15460000; //! 10% of data
-  // entries_exp = 15460000*3; //!
+  entries_exp = 15460000*3; //!
   // entries_exp = 10;
   // entries_exp = 5000000;
 
