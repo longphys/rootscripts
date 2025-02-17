@@ -124,8 +124,8 @@ void read1()
 
   TH1D* h0 = new TH1D("h0", "h0", bin, xmin, xmax);
   TH1D* h1 = new TH1D("h1", "h1", bin, xmin, xmax);
-  TH1D* h_cross0 = new TH1D("h_cross0", "h_cross0", bin, xmin, xmax);
-  TH1D* h_cross1 = new TH1D("h_cross1", "h_cross1", bin, xmin, xmax);
+  TH1D* h_cross_from_0_to_1 = new TH1D("h_cross_from_0_to_1", "h_cross_from_0_to_1", bin, xmin, xmax);
+  TH1D* h_cross_from_1_to_0 = new TH1D("h_cross_from_1_to_0", "h_cross_from_1_to_0", bin, xmin, xmax);
 
   TCanvas* cFit = new TCanvas("cFit", "Linear calibration", 800, 600);
   for(int i = 0; i < 2; i++){
@@ -152,7 +152,6 @@ void read1()
     xmaxCal[i] = xmax*a[i]+b[i];
   }
 
-
   TH1D* h0_cal = new TH1D("h0_cal", "h0_cal", bin/10, xminCal[0], xminCal[0]);
   TH1D* h_cross0_cal = new TH1D("h_cross0_cal", "h_cross0_cal", bin/10, xminCal[1], xmaxCal[1]);
   TH1D* h_alpha_amplitude = new TH1D("h_alpha_amplitude", "h_alpha_amplitude", bin, xmin, xmax);
@@ -163,7 +162,7 @@ void read1()
 
   long int entries = tree->GetEntriesFast();
   // entries = (int)1.0e6;
-  // entries = (int)5.0e7;
+  entries = (int)1.0e7;
   //std::cout << "test loop:" << std::endl;
 
   // double threshold_plas_0 = 30.;
@@ -176,7 +175,7 @@ void read1()
   // double threshold_plas_1 = 300.;
 
   int beam_xc = 8;
-  int beam_yc = 8;
+  int beam_yc = 14;
 
   int counttest = 0;
 
@@ -334,13 +333,14 @@ void read1()
         if ((x == beam_xc)&& (y == beam_yc))
         {
           h0->Fill(de_data[0]);
-          h0_cal->Fill(a[0]*(de_data[0]+0.5) + b[0]);
-          h1->Fill(de_data[1]);
+          // h0_cal->Fill(a[0]*(de_data[0]+0.5) + b[0]);
+          // h1->Fill(de_data[1]);
 
-          // if (de_data[1] < threshold_plas_1)
-          // {
-          //   h_cross1->Fill(de_data[0]);
-          // }
+           if (de_data[1] < threshold_plas_1) //! neutron mis-hits
+          //  if (de_data[1] > threshold_plas_1) //! proton cross-talk
+           {
+              h_cross_from_1_to_0->Fill(de_data[0]);
+           }
         }
 
         //! time
@@ -365,13 +365,14 @@ void read1()
         if ((x1 == beam_xc)&& (y1 == beam_yc))
         {
           // h0->Fill(de_data[0]);
-          // h1->Fill(de_data[1]);
+          h1->Fill(de_data[1]);
 
           //! If undetected in PLASTIC 0 but detected in PLASTIC 1 = PLASTIC 0'S CROSSTALK
-          if (de_data[0] < threshold_plas_0)
+          if (de_data[0] < threshold_plas_0) //! neutron mis-hits
+          // if (de_data[0] > threshold_plas_0) //! proton cross-talk
           {
-            h_cross0->Fill(de_data[1]);
-            h_cross0_cal->Fill(a[1]*(de_data[1]+0.5) + b[1]);
+            h_cross_from_0_to_1->Fill(de_data[1]);
+            // h_cross0_cal->Fill(a[1]*(de_data[1]+0.5) + b[1]);
           }
         }
       }
@@ -390,9 +391,9 @@ void read1()
   TCanvas* cn_cross = new TCanvas("cn_cross", "cn_cross", 700, 700);
   cn_cross->Divide(2,1);
   cn_cross->cd(1);
-  h_cross0->Draw();
+  h_cross_from_0_to_1->Draw();
   cn_cross->cd(2);
-  h_cross1->Draw();
+  h_cross_from_1_to_0->Draw();
 
   // TCanvas* ctime = new TCanvas("ctime", "ctime", 800, 800);
   // ctime->Divide(3,1);
@@ -411,13 +412,6 @@ void read1()
   h0->Draw();
   h0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
   double n_0 = h0->Integral(threshold_plas_0, xmax);
-
-  std::cout << "n_0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_0 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
-  std::cout << "Efficiency_0 = " << (n_0/n_alpha)*100 << "%\n";
-
-  double n_cross0 = h_cross0->GetEntries();
-  std::cout << "n_cross0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross0 << "\n";
-  std::cout << "cross-talk0 = " << (n_cross0/n_0)*100 << "%\n";
 
   // h0->Draw();
   // h0->GetXaxis()->SetRangeUser(threshold_plas_0, xmax);
@@ -439,12 +433,19 @@ void read1()
   h1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
   double n_1 = h1->Integral(threshold_plas_1, xmax);
 
-  std::cout << "n_1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_1 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
-  std::cout << "Efficiency_1 = " << (n_1/n_alpha)*100 << "%\n";
+  std::cout << "\nn_0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_0 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
+  std::cout << "\nEfficiency_0 = " << (n_0/n_alpha)*100 << "%\n";
 
-  double n_cross1 = h_cross1->GetEntries();
-  std::cout << "n_cross1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross1 << "\n";
-  std::cout << "cross-talk1 = " << (n_cross1/n_1) << "%\n";
+  double n_cross0 = h_cross_from_0_to_1->GetEntries();
+  std::cout << "\nn_cross0 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross0 << "\n";
+  std::cout << "\ncross-talk0 = " << (n_cross0/(n_0+n_1))*100 << "%\n";
+
+  std::cout << "\nn_1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_1 << "; n_alpha["<<beam_xc<<"]["<<beam_yc<<"]= " << n_alpha << "\n";
+  std::cout << "\nEfficiency_1 = " << (n_1/n_alpha)*100 << "%\n";
+
+  double n_cross1 = h_cross_from_1_to_0->GetEntries();
+  std::cout << "\nn_cross1 ["<<beam_xc<<"]["<<beam_yc<<"]= " << n_cross1 << "\n";
+  std::cout << "\ncross-talk1 = " << (n_cross1/(n_0+n_1))*100 << "%\n";
 
   // h1->Draw();
   // h1->GetXaxis()->SetRangeUser(threshold_plas_1, xmax);
