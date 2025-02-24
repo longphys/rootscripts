@@ -207,8 +207,8 @@ void readNeutron()
   
   Long64_t entries_exp = texp->GetEntries();
   // entries_exp = 15460000; //! 10% of data
-  entries_exp = 15460000*3; //!
-  // entries_exp = 10;
+  // entries_exp = 15460000*3; //!
+  // entries_exp = 100000;
   // entries_exp = 5000000;
 
 
@@ -269,7 +269,7 @@ void readNeutron()
   cutg->SetPoint(4, 0.0, 0.0);
 
   TCanvas* cFit = new TCanvas("cFit", "Linear calibration", 800, 600);
-  for(int i = 0; i < 2; i++){
+  for(int i = 0; i < 1; i++){
     TH1D* hCali = new TH1D("hCali", "Calibration fit", binExp, xminExp, xmaxExp);
     hCali->SetBinContent(ChCs137[i] - xminExp, ECs137);
     hCali->SetBinContent(ChNa22[i] - xminExp, ENa22);
@@ -523,7 +523,8 @@ void readNeutron()
   c1->cd();
   c1->Divide(2, 1);
 
-  hcal[0]->SetLineColor(kRed);
+  // hcal[0]->SetLineColor(kRed);
+  hcal[0]->SetLineColor(kBlue+2);
   hcal[0]->SetLineWidth(2);
   // hcal[1]->SetLineColor(kRed);
   
@@ -574,7 +575,7 @@ void readNeutron()
   // c2->cd(1);
   // hcal[channel_sim]->Add(hbackground[channel_sim],-1.);
   hcal[channel_sim]->Scale(scale_measurement, "noSW2");
-  hcal[channel_sim]->SetLineColor(kRed);
+  hcal[channel_sim]->SetLineColor(kBlue+2);
   hcal[channel_sim]->SetLineWidth(2);
   hcal[channel_sim]->SetStats(0);
   hcal[channel_sim]->Draw();
@@ -738,4 +739,8 @@ void readNeutron()
   TH1D* hClone = (TH1D*)hcal[0]->Clone();
   out->Write();
   out->Close();
+
+  TCanvas* exportCanvas = new TCanvas();
+  exportCanvas->cd();
+  hcal[0]->Draw();
 }
