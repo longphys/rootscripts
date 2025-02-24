@@ -145,7 +145,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=DemoRootApp
+CMAKE_PROJECT_NAME:STATIC=demo
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -319,6 +319,12 @@ VDT_INCLUDE_DIR:PATH=/home/long/software/root/root-6.30.02/rootinstall/include
 
 //Path to a library.
 VDT_LIBRARY:FILEPATH=/home/long/software/root/root-6.30.02/rootinstall/lib/libvdt.so
+
+//Value Computed by CMake
+demo_BINARY_DIR:STATIC=/home/long/data/rootscripts/important/demo_app/build
+
+//Value Computed by CMake
+demo_SOURCE_DIR:STATIC=/home/long/data/rootscripts/important/demo_app
 
 
 ########################
