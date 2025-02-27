@@ -21,17 +21,17 @@ Below is a list of available arguments and their descriptions:
   --name_f_sim_2 <path> – Path to the second simulation ROOT file.
   --name_f_mea_1 <path> – Path to the first measurement ROOT file.
   --name_f_mea_2 <path> – Path to the second measurement ROOT file.
-  --channel 2 
-  --entries_sim_fft 100000
-  --entries_mea_fft 100000
-  --entries_sim_descent 500000
-  --entries_mea_descent 500000
-  --x_min_sim 0.0
-  --x_max_sim 1.3
-  --x_min_mea 100
-  --x_max_mea 1000
-  --energy_1 0.477
-  --energy_2 1.061
+  --channel 2 <int> - Channel of interest of the measurement file.
+  --entries_sim_fft <int> - Number of entries from the simulation file for quick Fast Fourier Transform (FFT) to perform the first calibration.
+  --entries_mea_fft <int> - Number of entries from the measurement file for quick FFT to perform the first calibration.
+  --entries_sim_descent <int> - Number of entries from the simulation file for Gradient descent to perform up to the final calibration.
+  --entries_mea_descent <int> - Number of entries from the measurement file for Gradient descent to perform up to the final calibration.
+  --x_min_sim <double> - Lower limit of the simulation file histogram. (in MeV)
+  --x_max_sim <double> - Upper limit of the simulation file histogram. (in MeV)
+  --x_min_mea <double> - Lower limit of the measurement file histogram. (in channels)
+  --x_max_mea <double> - Upper limit of the measurement file histogram. (in channels)
+  --energy_1 <double> - Energy value of the first Compton edge. (in MeV)
+  --energy_2 <double> - Energy value of the second Compton edge. (in MeV)
   --res_1 8.
   --res_2 5.
   --x_min_fft_1 200
