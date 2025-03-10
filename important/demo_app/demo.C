@@ -101,8 +101,6 @@ double scale_sim_2 = 1.;
 double scale_mea_1 = 1.;
 double scale_mea_2 = 1.;
 
-
-
 bool CheckRootFile(const char* filename) {
     TFile file(filename);
     return !file.IsZombie();  // Check if the file exists

@@ -2,7 +2,7 @@ Requirements:
 
   CMake ≥ 3.10
   C++ Compiler (GCC/Clang/MSVC) supporting C++17
-  ROOT Framework (Download ROOT)
+  ROOT Framework version 6.30.02
 
 Build the Application:
 
@@ -16,15 +16,14 @@ Run the Program:
 
 The application accepts input arguments through a macro file.
 An example of a macro file is included.
-The only required arguments are the paths to the ROOT files.
-If only the paths to the ROOT files are provided in the macro file, default values of the other parameters will be used.
-Below is a list of available arguments and their descriptions:
+All arguments provided in the example is required.
 
+Below is a list of available arguments and their descriptions:
   --name_f_sim_1 <path> – Path to the first simulation ROOT file.
   --name_f_sim_2 <path> – Path to the second simulation ROOT file.
   --name_f_mea_1 <path> – Path to the first measurement ROOT file.
   --name_f_mea_2 <path> – Path to the second measurement ROOT file.
-  --channel 2 <int> - Channel of interest of the measurement file.
+  --channel <int> - Channel of interest of the measurement file.
   --entries_sim_fft <int> - Number of entries from the simulation file for quick Fast Fourier Transform (FFT) to perform the first calibration.
   --entries_mea_fft <int> - Number of entries from the measurement file for quick FFT to perform the first calibration.
   --entries_sim_descent <int> - Number of entries from the simulation file for Gradient descent to perform up to the final calibration.

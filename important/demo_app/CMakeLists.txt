@@ -14,6 +14,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Include ROOT headers
 include_directories(${ROOT_INCLUDE_DIRS})
 
+# Locating headers and sources
+file(GLOB sources ${PROJECT_SOURCE_DIR}/source/*.cc)
+file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+
 # Copy all mac files
 file(GLOB MACRO_FILES "*.mac")
 file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
