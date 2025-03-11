@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/long/data/rootscripts/important/demo_app/demo.cc
+/home/long/data/rootscripts/important/demo_app/demo.C
 TFile.h
 /home/long/data/rootscripts/important/demo_app/TFile.h
 TTree.h
