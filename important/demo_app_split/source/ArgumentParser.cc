@@ -1,4 +1,150 @@
 #include "ArgumentParser.hh"
+ArgumentParser::ArgumentParser() {
+  // Default values
+  name_f_sim_1 = "";
+  name_f_sim_2 = "";
+  name_f_mea_1 = "";
+  name_f_mea_2 = "";
+
+  channel = 0;
+  entries_sim_fft = 100000;
+  entries_mea_fft = 100000;
+  entries_sim_descent = 500000;
+  entries_mea_descent = 500000;
+
+  x_min_sim = 0.;
+  x_max_sim = 1.3;
+  bin_sim = (x_max_sim - x_min_sim) * 1000.;
+
+  x_min_mea = 0.;
+  x_max_mea = 1000.;
+  bin_mea = (x_max_mea - x_min_mea);
+
+  energy_1 = 0.477;
+  energy_2 = 1.061;
+
+  res_1 = 8.;
+  res_2 = 5.5;
+
+  x_min_fft_1 = 200;
+  x_max_fft_1 = x_max_mea;
+  x_min_fft_2 = 400;
+  x_max_fft_2 = x_max_mea;
+
+  x_min_descent_1 = 0.35;
+  x_max_descent_1 = 0.7;
+  x_min_descent_2 = 0.8;
+  x_max_descent_2 = 1.3;
+
+  rate_fft_ini_1 = 0.1;
+  rate_fft_ini_2 = 0.1;
+
+  thresh_fft_ini_1 = 50.;
+  thresh_fft_ini_2 = 50.;
+
+  rate_fft_descent_1 = 0.1;
+  rate_fft_descent_2 = 0.1;
+
+  thresh_fft_descent_sim = 800.;
+  thresh_fft_descent_mea = 800.;
+
+  learning_rate_channel_1 = 2.;
+  learning_rate_channel_2 = 2.;
+  learning_rate_res_1 = 0.05;
+  learning_rate_res_2 = 0.05;
+
+  step_channel_1 = 1.;
+  step_channel_2 = 1.;
+  step_res_1 = 0.;
+  step_res_2 = 0.;
+
+  scale_sim_1 = 1.;
+  scale_sim_2 = 1.;
+  scale_mea_1 = 1.;
+  scale_mea_2 = 1.;
+}
+
+
+  // Name of input file
+  std::string name_f_sim_1 = "";
+  std::string name_f_sim_2 = "";
+  std::string name_f_mea_1 = "";
+  std::string name_f_mea_2 = "";
+
+  // Default channel of the measurement file
+  int channel = 0;
+
+  // Default number of entries for FFT
+  int entries_sim_fft = 100000;
+  int entries_mea_fft = 100000;
+
+  // Default number of entries for gradient descent
+  int entries_sim_descent = 500000;
+  int entries_mea_descent = 500000;
+
+  // Default options for all histograms
+  double x_min_sim = 0.;
+  double x_max_sim = 1.3; // in MeV
+  int bin_sim = (x_max_sim - x_min_sim)*1000.;
+
+  double x_min_mea = 0.;
+  double x_max_mea = 1000.; // in channels
+  int bin_mea = (x_max_mea - x_min_mea);
+
+  // Default energies of Compton edges in MeV (Cs_137 and Na_22)
+  double energy_1 = 0.477;
+  double energy_2 = 1.061;
+
+  // Default first value for energy resolution in percentage
+  double res_1 = 8.;
+  double res_2 = 5.5;
+
+  // Default channel window to perform FFT
+  double x_min_fft_1 = 200;
+  double x_max_fft_1 = x_max_mea;
+  double x_min_fft_2 = 400;
+  double x_max_fft_2 = x_max_mea;
+
+  // Default energy window to perform gradient descent
+  double x_min_descent_1 = 0.35;
+  double x_max_descent_1 = 0.7;
+  double x_min_descent_2 = 0.8;
+  double x_max_descent_2 = 1.3;
+
+  // Default FFT cut-off growth rate for estimating Compton edge
+  double rate_fft_ini_1 = 0.1;
+  double rate_fft_ini_2 = 0.1;
+
+  // Default FFT threshold for estimating Compton edge
+  double thresh_fft_ini_1 = 50.;
+  double thresh_fft_ini_2 = 50.;
+
+  // Default FFT cut-off growth rate for performing gradient descent
+  double rate_fft_descent_1 = 0.1;
+  double rate_fft_descent_2 = 0.1;
+
+  // Default FFT threshold for performing gradient descent
+  double thresh_fft_descent_sim = 800.;
+  double thresh_fft_descent_mea = 800.;
+
+  // Default learning rate for gradient descent
+  double learning_rate_channel_1 = 2.;
+  double learning_rate_channel_2 = 2.; 
+  double learning_rate_res_1 = 0.05;
+  double learning_rate_res_2 = 0.05;
+
+  // Default step for calculating gradient
+  double step_channel_1 = 1.;
+  double step_channel_2 = 1.;
+  double step_res_1;
+  double step_res_2;
+
+  // Default scaling factor of histograms
+  double scale_sim_1 = 1.;
+  double scale_sim_2 = 1.;
+  double scale_mea_1 = 1.;
+  double scale_mea_2 = 1.;
+
 
 int ArgumentParser::Parse(int argc, char** argv){
   static struct option longOptions[] = {
@@ -51,55 +197,55 @@ int ArgumentParser::Parse(int argc, char** argv){
   };
 
   int opt;
-  while ((opt = getopt_long(argc, argv, "", longOptions, 0)) != -1) {
+  while ((opt = getopt_long(argc, argv, "", longOptions, 0)) != -1){
     switch(opt) {
-      case opt_name_f_sim_1:
-        if (optarg == nullptr || optarg[0] == '-') {
-          std::cerr << "Error: --opt_name_f_sim_1 requires an argument but none was provided.\n";
-          return -1;
-        }
-        name_f_sim_1 = optarg;
-        if (!CheckRootFile(name_f_sim_1.c_str())) {
-          std::cerr << "Error: Invalid simulated file 1: " << name_f_sim_1 << std::endl;
-          return -1;
-        }
-        break;
+    case opt_name_f_sim_1:
+      if (optarg == nullptr || optarg[0] == '-'){
+        std::cerr << "Error: --opt_name_f_sim_1 requires an argument but none was provided.\n";
+        return -1;
+      }
+      name_f_sim_1 = optarg;
+      if (!CheckRootFile(name_f_sim_1.c_str())){
+        std::cerr << "Error: Invalid simulated file 1: " << name_f_sim_1 << std::endl;
+        return -1;
+      }
+      break;
 
-      case opt_name_f_sim_2:
-        if (optarg == nullptr || optarg[0] == '-') {
-          std::cerr << "Error: --opt_name_f_sim_2 requires an argument but none was provided.\n";
-          return -1;
-        }
-        name_f_sim_2 = optarg;
-        if (!CheckRootFile(name_f_sim_2.c_str())) {
-          std::cerr << "Error: Invalid simulated file 2: " << name_f_sim_2 << std::endl;
-          return -1;
-        }
-        break;
-          
-      case opt_name_f_mea_1:
-        if (optarg == nullptr || optarg[0] == '-') {
-          std::cerr << "Error: --opt_name_f_mea_1 requires an argument but none was provided.\n";
-          return -1;
-        }
-        name_f_mea_1 = optarg;
-        if (!CheckRootFile(name_f_mea_1.c_str())) {
-          std::cerr << "Error: Invalid measurement file 1: " << name_f_mea_1 << std::endl;
-          return -1;
-        }
-        break;
+    case opt_name_f_sim_2:
+      if (optarg == nullptr || optarg[0] == '-'){
+        std::cerr << "Error: --opt_name_f_sim_2 requires an argument but none was provided.\n";
+        return -1;
+      }
+      name_f_sim_2 = optarg;
+      if (!CheckRootFile(name_f_sim_2.c_str())){
+        std::cerr << "Error: Invalid simulated file 2: " << name_f_sim_2 << std::endl;
+        return -1;
+      }
+      break;
+        
+    case opt_name_f_mea_1:
+      if (optarg == nullptr || optarg[0] == '-'){
+        std::cerr << "Error: --opt_name_f_mea_1 requires an argument but none was provided.\n";
+        return -1;
+      }
+      name_f_mea_1 = optarg;
+      if (!CheckRootFile(name_f_mea_1.c_str())){
+        std::cerr << "Error: Invalid measurement file 1: " << name_f_mea_1 << std::endl;
+        return -1;
+      }
+      break;
 
-      case opt_name_f_mea_2:
-        if (optarg == nullptr || optarg[0] == '-') {
-          std::cerr << "Error: --opt_name_f_mea_2 requires an argument but none was provided.\n";
-          return -1;
-        }
-        name_f_mea_2 = optarg;
-        if (!CheckRootFile(name_f_mea_2.c_str())) {
-          std::cerr << "Error: Invalid measurement file 2: " << name_f_mea_2 << std::endl;
-          return -1;
-        }
-        break;
+    case opt_name_f_mea_2:
+      if (optarg == nullptr || optarg[0] == '-'){
+        std::cerr << "Error: --opt_name_f_mea_2 requires an argument but none was provided.\n";
+        return -1;
+      }
+      name_f_mea_2 = optarg;
+      if (!CheckRootFile(name_f_mea_2.c_str())){
+        std::cerr << "Error: Invalid measurement file 2: " << name_f_mea_2 << std::endl;
+        return -1;
+      }
+      break;
             
     case opt_channel:
       WriteOutput(optarg, channel, channel, "channel");
@@ -268,10 +414,10 @@ int ArgumentParser::Parse(int argc, char** argv){
     case opt_scale_mea_2:
       WriteOutput(optarg, scale_mea_2, scale_mea_2, "Scaling factor for measurement histogram 2");
       break;
-      
-          case '?': // Handle unknown options
-              return -1;
-      }
+
+    case '?': // Handle unknown options
+      return -1;
+    }
   }
 
   // Ensure both simulated files are provided
