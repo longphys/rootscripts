@@ -21,7 +21,6 @@
 #include <cstring>  // For strcmp
 
 // Name of input file
-bool fReadFile = false;
 std::string name_f_sim_1 = "";
 std::string name_f_sim_2 = "";
 std::string name_f_mea_1 = "";

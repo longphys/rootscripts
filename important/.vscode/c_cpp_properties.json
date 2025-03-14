@@ -1,0 +1,19 @@
+{
+  "configurations": [
+      {
+          "name": "Linux",
+          "includePath": [
+              "${workspaceFolder}/**",
+              "/home/long/software/geant4/geant4-v11.1.2/**",
+              "/home/long/software/root/root-6.30.02/**",
+              ""
+          ],
+          "defines": [],
+          "cStandard": "c17",
+          "cppStandard": "gnu++14",
+          "intelliSenseMode": "linux-gcc-x64",
+          "compileCommands": "/home/long/software/root/root-6.30.02/rootbuild/compile_commands.json"
+      }
+  ],
+  "version": 4
+}
