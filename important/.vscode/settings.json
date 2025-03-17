@@ -79,6 +79,10 @@
     "typeindex": "cpp",
     "valarray": "cpp",
     "variant": "cpp",
-    "*.icc": "cpp"
+    "*.icc": "cpp",
+    "obj_list": "cpp",
+    "bmf": "cpp",
+    "group": "cpp",
+    "loader": "cpp"
   }
 }
