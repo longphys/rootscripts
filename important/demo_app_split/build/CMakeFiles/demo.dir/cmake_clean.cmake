@@ -1,5 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/demo.dir/demo.cc.o"
+  "CMakeFiles/demo.dir/source/ArgumentParser.cc.o"
+  "CMakeFiles/demo.dir/source/DataAnalyser.cc.o"
+  "CMakeFiles/demo.dir/source/MacroReader.cc.o"
   "demo"
   "demo.pdb"
 )

@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/long/data/rootscripts/important/demo_app
+CMAKE_SOURCE_DIR = /home/long/data/rootscripts/important/demo_app_split
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/long/data/rootscripts/important/demo_app/build
+CMAKE_BINARY_DIR = /home/long/data/rootscripts/important/demo_app_split/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/demo.dir/depend.make
@@ -59,25 +59,70 @@ include CMakeFiles/demo.dir/flags.make
 
 CMakeFiles/demo.dir/demo.cc.o: CMakeFiles/demo.dir/flags.make
 CMakeFiles/demo.dir/demo.cc.o: ../demo.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/long/data/rootscripts/important/demo_app/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/demo.dir/demo.cc.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/demo.dir/demo.cc.o -c /home/long/data/rootscripts/important/demo_app/demo.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/demo.dir/demo.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/demo.dir/demo.cc.o -c /home/long/data/rootscripts/important/demo_app_split/demo.cc
 
 CMakeFiles/demo.dir/demo.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/demo.dir/demo.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/long/data/rootscripts/important/demo_app/demo.cc > CMakeFiles/demo.dir/demo.cc.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/long/data/rootscripts/important/demo_app_split/demo.cc > CMakeFiles/demo.dir/demo.cc.i
 
 CMakeFiles/demo.dir/demo.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/demo.dir/demo.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/long/data/rootscripts/important/demo_app/demo.cc -o CMakeFiles/demo.dir/demo.cc.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/long/data/rootscripts/important/demo_app_split/demo.cc -o CMakeFiles/demo.dir/demo.cc.s
+
+CMakeFiles/demo.dir/source/ArgumentParser.cc.o: CMakeFiles/demo.dir/flags.make
+CMakeFiles/demo.dir/source/ArgumentParser.cc.o: ../source/ArgumentParser.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/demo.dir/source/ArgumentParser.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/demo.dir/source/ArgumentParser.cc.o -c /home/long/data/rootscripts/important/demo_app_split/source/ArgumentParser.cc
+
+CMakeFiles/demo.dir/source/ArgumentParser.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/demo.dir/source/ArgumentParser.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/long/data/rootscripts/important/demo_app_split/source/ArgumentParser.cc > CMakeFiles/demo.dir/source/ArgumentParser.cc.i
+
+CMakeFiles/demo.dir/source/ArgumentParser.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/demo.dir/source/ArgumentParser.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/long/data/rootscripts/important/demo_app_split/source/ArgumentParser.cc -o CMakeFiles/demo.dir/source/ArgumentParser.cc.s
+
+CMakeFiles/demo.dir/source/DataAnalyser.cc.o: CMakeFiles/demo.dir/flags.make
+CMakeFiles/demo.dir/source/DataAnalyser.cc.o: ../source/DataAnalyser.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/demo.dir/source/DataAnalyser.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/demo.dir/source/DataAnalyser.cc.o -c /home/long/data/rootscripts/important/demo_app_split/source/DataAnalyser.cc
+
+CMakeFiles/demo.dir/source/DataAnalyser.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/demo.dir/source/DataAnalyser.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/long/data/rootscripts/important/demo_app_split/source/DataAnalyser.cc > CMakeFiles/demo.dir/source/DataAnalyser.cc.i
+
+CMakeFiles/demo.dir/source/DataAnalyser.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/demo.dir/source/DataAnalyser.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/long/data/rootscripts/important/demo_app_split/source/DataAnalyser.cc -o CMakeFiles/demo.dir/source/DataAnalyser.cc.s
+
+CMakeFiles/demo.dir/source/MacroReader.cc.o: CMakeFiles/demo.dir/flags.make
+CMakeFiles/demo.dir/source/MacroReader.cc.o: ../source/MacroReader.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/demo.dir/source/MacroReader.cc.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/demo.dir/source/MacroReader.cc.o -c /home/long/data/rootscripts/important/demo_app_split/source/MacroReader.cc
+
+CMakeFiles/demo.dir/source/MacroReader.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/demo.dir/source/MacroReader.cc.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/long/data/rootscripts/important/demo_app_split/source/MacroReader.cc > CMakeFiles/demo.dir/source/MacroReader.cc.i
+
+CMakeFiles/demo.dir/source/MacroReader.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/demo.dir/source/MacroReader.cc.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/long/data/rootscripts/important/demo_app_split/source/MacroReader.cc -o CMakeFiles/demo.dir/source/MacroReader.cc.s
 
 # Object files for target demo
 demo_OBJECTS = \
-"CMakeFiles/demo.dir/demo.cc.o"
+"CMakeFiles/demo.dir/demo.cc.o" \
+"CMakeFiles/demo.dir/source/ArgumentParser.cc.o" \
+"CMakeFiles/demo.dir/source/DataAnalyser.cc.o" \
+"CMakeFiles/demo.dir/source/MacroReader.cc.o"
 
 # External object files for target demo
 demo_EXTERNAL_OBJECTS =
 
 demo: CMakeFiles/demo.dir/demo.cc.o
+demo: CMakeFiles/demo.dir/source/ArgumentParser.cc.o
+demo: CMakeFiles/demo.dir/source/DataAnalyser.cc.o
+demo: CMakeFiles/demo.dir/source/MacroReader.cc.o
 demo: CMakeFiles/demo.dir/build.make
 demo: /home/long/software/root/root-6.30.02/rootinstall/lib/libCore.so
 demo: /home/long/software/root/root-6.30.02/rootinstall/lib/libImt.so
@@ -99,7 +144,7 @@ demo: /home/long/software/root/root-6.30.02/rootinstall/lib/libThread.so
 demo: /home/long/software/root/root-6.30.02/rootinstall/lib/libMultiProc.so
 demo: /home/long/software/root/root-6.30.02/rootinstall/lib/libROOTVecOps.so
 demo: CMakeFiles/demo.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/long/data/rootscripts/important/demo_app/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable demo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable demo"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/demo.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -112,6 +157,6 @@ CMakeFiles/demo.dir/clean:
 .PHONY : CMakeFiles/demo.dir/clean
 
 CMakeFiles/demo.dir/depend:
-	cd /home/long/data/rootscripts/important/demo_app/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/long/data/rootscripts/important/demo_app /home/long/data/rootscripts/important/demo_app /home/long/data/rootscripts/important/demo_app/build /home/long/data/rootscripts/important/demo_app/build /home/long/data/rootscripts/important/demo_app/build/CMakeFiles/demo.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/long/data/rootscripts/important/demo_app_split/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/long/data/rootscripts/important/demo_app_split /home/long/data/rootscripts/important/demo_app_split /home/long/data/rootscripts/important/demo_app_split/build /home/long/data/rootscripts/important/demo_app_split/build /home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles/demo.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/demo.dir/depend
 

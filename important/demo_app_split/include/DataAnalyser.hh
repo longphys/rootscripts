@@ -20,6 +20,6 @@ class DataAnalyser{
 public:
   TH1D* fft(TH1D* h_channel, double para_k, double para_c, std::string name_h_channel, std::string title_h_channel);
   TH1D* Diff(TH1D* h_channel, std::string name_h_channel, std::string title_h_channel);
-  void Analyze();
+  void Analyze(Config& config);
 };
 #endif

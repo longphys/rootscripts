@@ -6,5 +6,5 @@ CXX_FLAGS =  -g -g   -std=gnu++17
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/long/software/root/root-6.30.02/rootinstall/include -I/home/long/data/rootscripts/important/demo_app/include 
+CXX_INCLUDES = -I/home/long/software/root/root-6.30.02/rootinstall/include -I/home/long/data/rootscripts/important/demo_app_split/include 
 

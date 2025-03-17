@@ -28,7 +28,7 @@ file(GLOB MACRO_FILES "*.mac")
 file(COPY ${MACRO_FILES} DESTINATION ${PROJECT_BINARY_DIR})
 
 # Create an executable
-add_executable(demo demo.cc)
+add_executable(demo demo.cc ${sources})
 
 # Link against ROOT libraries
 target_link_libraries(demo ${ROOT_LIBRARIES})

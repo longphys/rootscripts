@@ -14,6 +14,7 @@
 #include "ArgumentParser.hh"
 #include "MacroReader.hh"
 #include "DataAnalyser.hh"
+#include "Config.hh"
 
 #include <iostream>
 #include <cmath>
@@ -59,8 +60,10 @@ int main(int argc, char **argv)
   int new_argc = c_args.size() - 1;
   char** new_argv = c_args.data();
 
+  Config config;
+
   ArgumentParser anArgumentParser;
-  if (anArgumentParser.Parse(new_argc, new_argv) != 0) return 1;
+  if (anArgumentParser.Parse(new_argc, new_argv, config) != 0) return 1;
 
   // Initialize application
   TApplication app("app", &argc, argv);
@@ -69,7 +72,7 @@ int main(int argc, char **argv)
 
   // Analyze the data
   DataAnalyser aDataAnalyser;
-  aDataAnalyser.Analyze();
+  aDataAnalyser.Analyze(config);
   std::cerr << "\nRun success.\n";
   app.Run();
 

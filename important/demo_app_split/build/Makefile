@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/long/data/rootscripts/important/demo_app
+CMAKE_SOURCE_DIR = /home/long/data/rootscripts/important/demo_app_split
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/long/data/rootscripts/important/demo_app/build
+CMAKE_BINARY_DIR = /home/long/data/rootscripts/important/demo_app_split/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/long/data/rootscripts/important/demo_app/build/CMakeFiles /home/long/data/rootscripts/important/demo_app/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles /home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/long/data/rootscripts/important/demo_app/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/long/data/rootscripts/important/demo_app_split/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -150,6 +150,87 @@ demo.cc.s:
 	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/demo.cc.s
 .PHONY : demo.cc.s
 
+source/ArgumentParser.o: source/ArgumentParser.cc.o
+
+.PHONY : source/ArgumentParser.o
+
+# target to build an object file
+source/ArgumentParser.cc.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/ArgumentParser.cc.o
+.PHONY : source/ArgumentParser.cc.o
+
+source/ArgumentParser.i: source/ArgumentParser.cc.i
+
+.PHONY : source/ArgumentParser.i
+
+# target to preprocess a source file
+source/ArgumentParser.cc.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/ArgumentParser.cc.i
+.PHONY : source/ArgumentParser.cc.i
+
+source/ArgumentParser.s: source/ArgumentParser.cc.s
+
+.PHONY : source/ArgumentParser.s
+
+# target to generate assembly for a file
+source/ArgumentParser.cc.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/ArgumentParser.cc.s
+.PHONY : source/ArgumentParser.cc.s
+
+source/DataAnalyser.o: source/DataAnalyser.cc.o
+
+.PHONY : source/DataAnalyser.o
+
+# target to build an object file
+source/DataAnalyser.cc.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/DataAnalyser.cc.o
+.PHONY : source/DataAnalyser.cc.o
+
+source/DataAnalyser.i: source/DataAnalyser.cc.i
+
+.PHONY : source/DataAnalyser.i
+
+# target to preprocess a source file
+source/DataAnalyser.cc.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/DataAnalyser.cc.i
+.PHONY : source/DataAnalyser.cc.i
+
+source/DataAnalyser.s: source/DataAnalyser.cc.s
+
+.PHONY : source/DataAnalyser.s
+
+# target to generate assembly for a file
+source/DataAnalyser.cc.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/DataAnalyser.cc.s
+.PHONY : source/DataAnalyser.cc.s
+
+source/MacroReader.o: source/MacroReader.cc.o
+
+.PHONY : source/MacroReader.o
+
+# target to build an object file
+source/MacroReader.cc.o:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/MacroReader.cc.o
+.PHONY : source/MacroReader.cc.o
+
+source/MacroReader.i: source/MacroReader.cc.i
+
+.PHONY : source/MacroReader.i
+
+# target to preprocess a source file
+source/MacroReader.cc.i:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/MacroReader.cc.i
+.PHONY : source/MacroReader.cc.i
+
+source/MacroReader.s: source/MacroReader.cc.s
+
+.PHONY : source/MacroReader.s
+
+# target to generate assembly for a file
+source/MacroReader.cc.s:
+	$(MAKE) -f CMakeFiles/demo.dir/build.make CMakeFiles/demo.dir/source/MacroReader.cc.s
+.PHONY : source/MacroReader.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,6 +243,15 @@ help:
 	@echo "... demo.o"
 	@echo "... demo.i"
 	@echo "... demo.s"
+	@echo "... source/ArgumentParser.o"
+	@echo "... source/ArgumentParser.i"
+	@echo "... source/ArgumentParser.s"
+	@echo "... source/DataAnalyser.o"
+	@echo "... source/DataAnalyser.i"
+	@echo "... source/DataAnalyser.s"
+	@echo "... source/MacroReader.o"
+	@echo "... source/MacroReader.i"
+	@echo "... source/MacroReader.s"
 .PHONY : help
 
 

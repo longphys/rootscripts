@@ -132,12 +132,12 @@ double chi2(TH1D* h_channel_1, TH1D* h_channel_2){
 }
 
 // Function that performs linear calibration of energy and returns coefficients.
-double fit_energy(int channel_1, int channel_2, TCanvas* c_fit, int i){
-	TH1D* h_calibrate = new TH1D("h_calibrate", "Calibration fit", bin_mea, x_min_mea, x_max_mea);
-	h_calibrate->SetBinContent(channel_1 - x_min_mea, energy_1);
-	h_calibrate->SetBinContent(channel_2 - x_min_mea, energy_2);
+double fit_energy(int channel_1, int channel_2, TCanvas* c_fit, int i, const Config& config){
+	TH1D* h_calibrate = new TH1D("h_calibrate", "Calibration fit", config.bin_mea, config.x_min_mea, config.x_max_mea);
+	h_calibrate->SetBinContent(channel_1 - config.x_min_mea, config.energy_1);
+	h_calibrate->SetBinContent(channel_2 - config.x_min_mea, config.energy_2);
 
-	TF1* f_linear = new TF1("f_linear", "[0]*x + [1]", x_min_mea, x_max_mea);
+	TF1* f_linear = new TF1("f_linear", "[0]*x + [1]", config.x_min_mea, config.x_max_mea);
 	c_fit->cd(1);
 	h_calibrate->Fit("f_linear", "Q");
 
@@ -155,15 +155,15 @@ double fit_energy(int channel_1, int channel_2, TCanvas* c_fit, int i){
 }
 
 // Function that performs calibration of energy resolution and returns coefficients.
-double fit_energy_res(double res_sig_1, double res_sig_2, TH1D* h_1, TH1D* h_2, double x_min, double x_max, TCanvas* c_fit, int i){
-	TH1D* h_res = new TH1D("h_res", "Resolution fit", bin_mea, x_min, x_max);
-	h_res->SetBinContent(h_1->FindBin(energy_1), res_sig_1/100.);
-	h_res->SetBinContent(h_2->FindBin(energy_2), res_sig_2/100.);
+double fit_energy_res(double res_sig_1, double res_sig_2, TH1D* h_1, TH1D* h_2, double x_min, double x_max, TCanvas* c_fit, int i, Config& config){
+	TH1D* h_res = new TH1D("h_res", "Resolution fit", config.bin_mea, x_min, x_max);
+	h_res->SetBinContent(h_1->FindBin(config.energy_1), res_sig_1/100.);
+	h_res->SetBinContent(h_2->FindBin(config.energy_2), res_sig_2/100.);
 
 	//! Choose fit function
 	TF1* f_res = new TF1("f_res", "sqrt([0]*[0] + [1]*[1]/(x*x))");
 	c_fit->cd(2);
-	h_res->Fit("f_res", "Q", "", energy_1-0.1, energy_2+0.1);
+	h_res->Fit("f_res", "Q", "", config.energy_1-0.1, config.energy_2+0.1);
 
 	//! Correspond to chosen function
 	double coef_a = std::abs(f_res->GetParameter(0));
@@ -181,19 +181,19 @@ double fit_energy_res(double res_sig_1, double res_sig_2, TH1D* h_1, TH1D* h_2, 
 	else{return coef_c;}
 }
 
-void DataAnalyser::Analyze()
+void DataAnalyser::Analyze(Config& config)
 {
-	std::cerr << "Sim1: " << name_f_sim_1 << "\n";
-	std::cerr << "Sim2: " << name_f_sim_2 << "\n";
-	std::cerr << "Mea1: " << name_f_mea_1 << "\n";
-	std::cerr << "Mea2: " << name_f_mea_2 << "\n";
+	std::cerr << "Sim1: " << config.name_f_sim_1 << "\n";
+	std::cerr << "Sim2: " << config.name_f_sim_2 << "\n";
+	std::cerr << "Mea1: " << config.name_f_mea_1 << "\n";
+	std::cerr << "Mea2: " << config.name_f_mea_2 << "\n";
 	
 	//! Read the simulation and measurement files
-	TFile* f_sim_1 = new TFile(name_f_sim_1.c_str(), "read");
-	TFile* f_sim_2 = new TFile(name_f_sim_2.c_str(), "read");
+	TFile* f_sim_1 = new TFile(config.name_f_sim_1.c_str(), "read");
+	TFile* f_sim_2 = new TFile(config.name_f_sim_2.c_str(), "read");
 	
-	TFile* f_mea_1 = new TFile(name_f_mea_1.c_str(), "read");
-	TFile* f_mea_2 = new TFile(name_f_mea_2.c_str(), "read");
+	TFile* f_mea_1 = new TFile(config.name_f_mea_1.c_str(), "read");
+	TFile* f_mea_2 = new TFile(config.name_f_mea_2.c_str(), "read");
 
 	TCanvas* c_fit = new TCanvas("c_fit", "c_fit", 1000, 500);
 	c_fit->Divide(2,1);
@@ -218,27 +218,27 @@ void DataAnalyser::Analyze()
 	t_sim_2->SetBranchAddress("Scintillator", &event_sim_2);
 	
 	//! Fill histograms for FFT to estimate Compton edge
-	TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", bin_mea, x_min_mea, x_max_mea);
+	TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
 
-	for(int i = 0; i < entries_mea_fft; i++){
+	for(int i = 0; i < config.entries_mea_fft; i++){
 		t_mea_1->GetEntry(i);
-		h_mea_1_estimate->Fill(event_mea_1[channel]);
+		h_mea_1_estimate->Fill(event_mea_1[config.channel]);
 	}
 
-	TH1D* h_mea_1_estimate_filtered = fft(h_mea_1_estimate, rate_fft_ini_1, thresh_fft_ini_1,
+	TH1D* h_mea_1_estimate_filtered = fft(h_mea_1_estimate, config.rate_fft_ini_1, config.thresh_fft_ini_1,
 	"h_mea_1_estimate_filtered", "First measurement histogram filtered");
 	
 	h_mea_1_estimate_filtered->GetXaxis()->SetTitle("Channel");
 	h_mea_1_estimate_filtered->GetYaxis()->SetTitle("Count");
 	TH1D* h_mea_1_estimate_diff = Diff(h_mea_1_estimate_filtered, "h_mea_1_estimate_diff", "Derivative of First measurement histogram");
 
-	TH1D* h_mea_2_estimate = new TH1D("h_mea_2_estimate", "Second measurement histogram", bin_mea, x_min_mea, x_max_mea);
-	for(int i = 0; i < entries_mea_fft; i++){
+	TH1D* h_mea_2_estimate = new TH1D("h_mea_2_estimate", "Second measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
+	for(int i = 0; i < config.entries_mea_fft; i++){
 		t_mea_2->GetEntry(i);
-		h_mea_2_estimate->Fill(event_mea_2[channel]);
+		h_mea_2_estimate->Fill(event_mea_2[config.channel]);
 	}
 	
-	TH1D* h_mea_2_estimate_filtered = fft(h_mea_2_estimate, rate_fft_ini_2, thresh_fft_ini_2, "h_mea_2_estimate_filtered", "Second measurement histogram filtered");
+	TH1D* h_mea_2_estimate_filtered = fft(h_mea_2_estimate, config.rate_fft_ini_2, config.thresh_fft_ini_2, "h_mea_2_estimate_filtered", "Second measurement histogram filtered");
 	h_mea_2_estimate_filtered->GetXaxis()->SetTitle("Channel");
 	h_mea_2_estimate_filtered->GetYaxis()->SetTitle("Count");
 	TH1D* h_mea_2_estimate_diff = Diff(h_mea_2_estimate_filtered, "h_mea_2_estimate_diff", "Derivative of Second measurement histogram");
@@ -250,16 +250,16 @@ void DataAnalyser::Analyze()
 	h_mea_1_estimate_filtered->Draw();
 	c_derivative->cd(3);
 	h_mea_1_estimate_diff->Draw();
-	h_mea_1_estimate_diff->GetXaxis()->SetRangeUser(x_min_fft_1, x_max_fft_1);
-	int ch1 = h_mea_1_estimate_diff->GetMinimumBin() + x_min_mea;
+	h_mea_1_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_1, config.x_max_fft_1);
+	int ch1 = h_mea_1_estimate_diff->GetMinimumBin() + config.x_min_mea;
 	std::cout << "ch1 = " << ch1 << "\n";
 
 	c_derivative->cd(2);
 	h_mea_2_estimate_filtered->Draw();
 	c_derivative->cd(4);
 	h_mea_2_estimate_diff->Draw();
-	h_mea_2_estimate_diff->GetXaxis()->SetRangeUser(x_min_fft_2, x_max_fft_2);
-	int ch2 = h_mea_2_estimate_diff->GetMinimumBin() + x_min_mea;
+	h_mea_2_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_2, config.x_max_fft_2);
+	int ch2 = h_mea_2_estimate_diff->GetMinimumBin() + config.x_min_mea;
 	std::cout << "ch2 = " << ch2 << "\n";
 
 	c_derivative->Modified();
@@ -293,91 +293,91 @@ void DataAnalyser::Analyze()
     std::cout << "\nIteration " << iteration << ":\n";
   
     //! Energy calibration coefficients
-    double a = fit_energy(ch1, ch2, c_fit, 0);
-    double b = fit_energy(ch1, ch2, c_fit, 1);
+    double a = fit_energy(ch1, ch2, c_fit, 0, config);
+    double b = fit_energy(ch1, ch2, c_fit, 1, config);
   
-    double a_up_ch1 = fit_energy(ch1+step_channel_1, ch2, c_fit, 0);
-    double b_up_ch1 = fit_energy(ch1+step_channel_1, ch2, c_fit, 1);
+    double a_up_ch1 = fit_energy(ch1+config.step_channel_1, ch2, c_fit, 0, config);
+    double b_up_ch1 = fit_energy(ch1+config.step_channel_1, ch2, c_fit, 1, config);
   
-    double a_up_ch2 = fit_energy(ch1, ch2+step_channel_2, c_fit, 0);
-    double b_up_ch2 = fit_energy(ch1, ch2+step_channel_2, c_fit, 1);
+    double a_up_ch2 = fit_energy(ch1, ch2+config.step_channel_2, c_fit, 0, config);
+    double b_up_ch2 = fit_energy(ch1, ch2+config.step_channel_2, c_fit, 1, config);
   
     //! Boundaries
-    double x_min_cal = x_min_mea*a+b;
-    double x_max_cal = x_max_mea*a+b;
+    double x_min_cal = config.x_min_mea*a+b;
+    double x_max_cal = config.x_max_mea*a+b;
   
-    double x_min_cal_up_ch1 = x_min_mea*a_up_ch1+b_up_ch1;
-    double x_max_cal_up_ch1 = x_max_mea*a_up_ch1+b_up_ch1;
+    double x_min_cal_up_ch1 = config.x_min_mea*a_up_ch1+b_up_ch1;
+    double x_max_cal_up_ch1 = config.x_max_mea*a_up_ch1+b_up_ch1;
   
-    double x_min_cal_up_ch2 = x_min_mea*a_up_ch2+b_up_ch2;
-    double x_max_cal_up_ch2 = x_max_mea*a_up_ch2+b_up_ch2;
+    double x_min_cal_up_ch2 = config.x_min_mea*a_up_ch2+b_up_ch2;
+    double x_max_cal_up_ch2 = config.x_max_mea*a_up_ch2+b_up_ch2;
   
     //! Histograms (1st file)
-    TH1D* h_sim_1_res = new TH1D("h_sim_1_res", "Simulation 1 with resolution", bin_mea, x_min_cal, x_max_cal);
-    TH1D* h_cal_1 = new TH1D("h_cal_1", "Measurement 1 Calibrated", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_1_res = new TH1D("h_sim_1_res", "Simulation 1 with resolution", config.bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_cal_1 = new TH1D("h_cal_1", "Measurement 1 Calibrated", config.bin_mea, x_min_cal, x_max_cal);
   
-    TH1D* h_sim_1_res_up_ch1 = new TH1D("h_sim_1_res_up_ch1", "Simulation 1 with resolution", bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
-    TH1D* h_cal_1_up_ch1 = new TH1D("h_cal_1_up_ch1", "Measurement 1 Calibrated", bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
+    TH1D* h_sim_1_res_up_ch1 = new TH1D("h_sim_1_res_up_ch1", "Simulation 1 with resolution", config.bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
+    TH1D* h_cal_1_up_ch1 = new TH1D("h_cal_1_up_ch1", "Measurement 1 Calibrated", config.bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
   
-    TH1D* h_sim_1_res_up_ch2 = new TH1D("h_sim_1_res_up_ch2", "Simulation 1 with resolution", bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
-    TH1D* h_cal_1_up_ch2 = new TH1D("h_cal_1_up_ch2", "Measurement 1 Calibrated", bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
+    TH1D* h_sim_1_res_up_ch2 = new TH1D("h_sim_1_res_up_ch2", "Simulation 1 with resolution", config.bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
+    TH1D* h_cal_1_up_ch2 = new TH1D("h_cal_1_up_ch2", "Measurement 1 Calibrated", config.bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
   
-    TH1D* h_sim_1_res_up_sig1 = new TH1D("h_sim_1_res_up_sig1", "Simulation 1 with resolution", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_1_res_up_sig1 = new TH1D("h_sim_1_res_up_sig1", "Simulation 1 with resolution", config.bin_mea, x_min_cal, x_max_cal);
   
-    TH1D* h_sim_1_res_up_sig2 = new TH1D("h_sim_1_res_up_sig2", "Simulation 1 with resolution", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_1_res_up_sig2 = new TH1D("h_sim_1_res_up_sig2", "Simulation 1 with resolution", config.bin_mea, x_min_cal, x_max_cal);
   
     //! Histograms (2nd file)
-    TH1D* h_sim_2_res = new TH1D("h_sim_2_res", "Na22 Simulation with resolution", bin_mea, x_min_cal, x_max_cal);
-    TH1D* h_cal_2 = new TH1D("h_cal_2", "Na22 Experiment Calibrated", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_2_res = new TH1D("h_sim_2_res", "Na22 Simulation with resolution", config.bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_cal_2 = new TH1D("h_cal_2", "Na22 Experiment Calibrated", config.bin_mea, x_min_cal, x_max_cal);
   
-    TH1D* h_sim_2_res_up_ch1 = new TH1D("h_sim_2_res_up_ch1", "Na22 Simulation with resolution", bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
-    TH1D* h_cal_2_up_ch1 = new TH1D("h_cal_2_up_ch1", "Na22 Experiment Calibrated", bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
+    TH1D* h_sim_2_res_up_ch1 = new TH1D("h_sim_2_res_up_ch1", "Na22 Simulation with resolution", config.bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
+    TH1D* h_cal_2_up_ch1 = new TH1D("h_cal_2_up_ch1", "Na22 Experiment Calibrated", config.bin_mea, x_min_cal_up_ch1, x_max_cal_up_ch1);
   
-    TH1D* h_sim_2_res_up_ch2 = new TH1D("h_sim_2_res_up_ch2", "Na22 Simulation with resolution", bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
-    TH1D* h_cal_2_up_ch2 = new TH1D("h_cal_2_up_ch2", "Na22 Experiment Calibrated", bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
+    TH1D* h_sim_2_res_up_ch2 = new TH1D("h_sim_2_res_up_ch2", "Na22 Simulation with resolution", config.bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
+    TH1D* h_cal_2_up_ch2 = new TH1D("h_cal_2_up_ch2", "Na22 Experiment Calibrated", config.bin_mea, x_min_cal_up_ch2, x_max_cal_up_ch2);
   
-    TH1D* h_sim_2_res_up_sig1 = new TH1D("h_sim_2_res_up_sig1", "Na22 Simulation with resolution", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_2_res_up_sig1 = new TH1D("h_sim_2_res_up_sig1", "Na22 Simulation with resolution", config.bin_mea, x_min_cal, x_max_cal);
   
-    TH1D* h_sim_2_res_up_sig2 = new TH1D("h_sim_2_res_up_sig2", "Na22 Simulation with resolution", bin_mea, x_min_cal, x_max_cal);
+    TH1D* h_sim_2_res_up_sig2 = new TH1D("h_sim_2_res_up_sig2", "Na22 Simulation with resolution", config.bin_mea, x_min_cal, x_max_cal);
   
     //! Fill experiment histograms (1st file)
-    for(int i = 0; i < entries_mea_descent; i++){
+    for(int i = 0; i < config.entries_mea_descent; i++){
       t_mea_1->GetEntry(i);
-      h_cal_1->Fill(a*(event_mea_1[channel]+0.5) + b);
-      h_cal_1_up_ch1->Fill(a_up_ch1*(event_mea_1[channel]+0.5) + b_up_ch1);
-      h_cal_1_up_ch2->Fill(a_up_ch2*(event_mea_1[channel]+0.5) + b_up_ch2);
+      h_cal_1->Fill(a*(event_mea_1[config.channel]+0.5) + b);
+      h_cal_1_up_ch1->Fill(a_up_ch1*(event_mea_1[config.channel]+0.5) + b_up_ch1);
+      h_cal_1_up_ch2->Fill(a_up_ch2*(event_mea_1[config.channel]+0.5) + b_up_ch2);
     }
-    TH1D* h_cal_1_filtered = fft(h_cal_1, 0.1, thresh_fft_descent_mea, "h_cal_1_filtered", "h_cal_1_filtered");
-    TH1D* h_cal_1_up_ch1_filtered = fft(h_cal_1_up_ch1, 0.1, thresh_fft_descent_mea, "h_cal_1_up_ch1_filtered", "h_cal_1_up_ch1_filtered");
-    TH1D* h_cal_1_up_ch2_filtered = fft(h_cal_1_up_ch2, 0.1, thresh_fft_descent_mea, "h_cal_1_up_ch2_filtered", "h_cal_1_up_ch2_filtered");
+    TH1D* h_cal_1_filtered = fft(h_cal_1, 0.1, config.thresh_fft_descent_mea, "h_cal_1_filtered", "h_cal_1_filtered");
+    TH1D* h_cal_1_up_ch1_filtered = fft(h_cal_1_up_ch1, 0.1, config.thresh_fft_descent_mea, "h_cal_1_up_ch1_filtered", "h_cal_1_up_ch1_filtered");
+    TH1D* h_cal_1_up_ch2_filtered = fft(h_cal_1_up_ch2, 0.1, config.thresh_fft_descent_mea, "h_cal_1_up_ch2_filtered", "h_cal_1_up_ch2_filtered");
   
     //! Fill experiment histograms (2nd file)
-    for(int i = 0; i < entries_mea_descent; i++){
+    for(int i = 0; i < config.entries_mea_descent; i++){
       t_mea_2->GetEntry(i);
-      h_cal_2->Fill(a*(event_mea_2[channel]+0.5) + b);
-      h_cal_2_up_ch1->Fill(a_up_ch1*(event_mea_2[channel]+0.5) + b_up_ch1);
-      h_cal_2_up_ch2->Fill(a_up_ch2*(event_mea_2[channel]+0.5) + b_up_ch2);
+      h_cal_2->Fill(a*(event_mea_2[config.channel]+0.5) + b);
+      h_cal_2_up_ch1->Fill(a_up_ch1*(event_mea_2[config.channel]+0.5) + b_up_ch1);
+      h_cal_2_up_ch2->Fill(a_up_ch2*(event_mea_2[config.channel]+0.5) + b_up_ch2);
     }
-    TH1D* h_cal_2_filtered = fft(h_cal_2, 0.1, thresh_fft_descent_mea, "h_cal_2_filtered", "h_cal_2_filtered");
-    TH1D* h_cal_2_up_ch1_filtered = fft(h_cal_2_up_ch1, 0.1, thresh_fft_descent_mea, "h_cal_2_up_ch1_filtered", "h_cal_2_up_ch1_filtered");
-    TH1D* h_cal_2_up_ch2_filtered = fft(h_cal_2_up_ch2, 0.1, thresh_fft_descent_mea, "h_cal_2_up_ch2_filtered", "h_cal_2_up_ch2_filtered");
+    TH1D* h_cal_2_filtered = fft(h_cal_2, 0.1, config.thresh_fft_descent_mea, "h_cal_2_filtered", "h_cal_2_filtered");
+    TH1D* h_cal_2_up_ch1_filtered = fft(h_cal_2_up_ch1, 0.1, config.thresh_fft_descent_mea, "h_cal_2_up_ch1_filtered", "h_cal_2_up_ch1_filtered");
+    TH1D* h_cal_2_up_ch2_filtered = fft(h_cal_2_up_ch2, 0.1, config.thresh_fft_descent_mea, "h_cal_2_up_ch2_filtered", "h_cal_2_up_ch2_filtered");
   
     //! Prepare Energy Resolution coefficients
-    double a_res = fit_energy_res(res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0);
-    double b_res = fit_energy_res(res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1);
-    double c_res = fit_energy_res(res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2);
+    double a_res = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0, config);
+    double b_res = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1, config);
+    double c_res = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2, config);
   
-    double a_res_up_sig1 = fit_energy_res(res_1+step_res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0);
-    double b_res_up_sig1 = fit_energy_res(res_1+step_res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1);
-    double c_res_up_sig1 = fit_energy_res(res_1+step_res_1, res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2);
+    double a_res_up_sig1 = fit_energy_res(config.res_1+config.step_res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0, config);
+    double b_res_up_sig1 = fit_energy_res(config.res_1+config.step_res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1, config);
+    double c_res_up_sig1 = fit_energy_res(config.res_1+config.step_res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2, config);
   
-    double a_res_up_sig2 = fit_energy_res(res_1, res_2+step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0);
-    double b_res_up_sig2 = fit_energy_res(res_1, res_2+step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1);
-    double c_res_up_sig2 = fit_energy_res(res_1, res_2+step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2);
+    double a_res_up_sig2 = fit_energy_res(config.res_1, config.res_2+config.step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 0, config);
+    double b_res_up_sig2 = fit_energy_res(config.res_1, config.res_2+config.step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 1, config);
+    double c_res_up_sig2 = fit_energy_res(config.res_1, config.res_2+config.step_res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 2, config);
   
     TRandom3* ranGen = new TRandom3();
     //! Fill Simulation histograms (1st file)
-    for (int i = 0; i < entries_sim_descent; i++)
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res,2) + pow(b_res/sqrt(event_sim_1),2) + pow(c_res/event_sim_1,2) );
@@ -386,29 +386,30 @@ void DataAnalyser::Analyze()
       h_sim_1_res_up_ch1->Fill(energy);
       h_sim_1_res_up_ch2->Fill(energy);
     }
-    TH1D* h_sim_1_res_filtered = fft(h_sim_1_res, 0.1, thresh_fft_descent_sim, "h_sim_1_res_filtered", "h_sim_1_res_filtered");
-    TH1D* h_sim_1_res_up_ch1_filtered = fft(h_sim_1_res_up_ch1, 0.1, thresh_fft_descent_sim, "h_sim_1_res_up_ch1_filtered", "h_sim_1_res_up_ch1_filtered");
-    TH1D* h_sim_1_res_up_ch2_filtered = fft(h_sim_1_res_up_ch2, 0.1, thresh_fft_descent_sim, "h_sim_1_res_up_ch2_filtered", "h_sim_1_res_up_ch2_filtered");    for (int i = 0; i < entries_sim_descent; i++)
+    TH1D* h_sim_1_res_filtered = fft(h_sim_1_res, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_filtered", "h_sim_1_res_filtered");
+    TH1D* h_sim_1_res_up_ch1_filtered = fft(h_sim_1_res_up_ch1, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_ch1_filtered", "h_sim_1_res_up_ch1_filtered");
+    TH1D* h_sim_1_res_up_ch2_filtered = fft(h_sim_1_res_up_ch2, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_ch2_filtered", "h_sim_1_res_up_ch2_filtered");    
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res_up_sig1,2) + pow(b_res_up_sig1/sqrt(event_sim_1),2) + pow(c_res_up_sig1/event_sim_1,2) );
       h_sim_1_res_up_sig1->Fill(ranGen->Gaus(event_sim_1,sigma));
     }
-    TH1D* h_sim_1_res_up_sig1_filtered = fft(h_sim_1_res_up_sig1, 0.1, thresh_fft_descent_sim, "h_sim_1_res_up_sig1_filtered", "h_sim_1_res_up_sig1_filtered");
+    TH1D* h_sim_1_res_up_sig1_filtered = fft(h_sim_1_res_up_sig1, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_sig1_filtered", "h_sim_1_res_up_sig1_filtered");
   
-    for (int i = 0; i < entries_sim_descent; i++)
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res_up_sig2,2) + pow(b_res_up_sig2/sqrt(event_sim_1),2) + pow((c_res_up_sig2)/event_sim_1,2) );
       h_sim_1_res_up_sig2->Fill(ranGen->Gaus(event_sim_1,sigma));
     }
-    TH1D* h_sim_1_res_up_sig2_filtered = fft(h_sim_1_res_up_sig2, 0.1, thresh_fft_descent_sim, "h_sim_1_res_up_sig2_filtered", "h_sim_1_res_up_sig2_filtered");
+    TH1D* h_sim_1_res_up_sig2_filtered = fft(h_sim_1_res_up_sig2, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_sig2_filtered", "h_sim_1_res_up_sig2_filtered");
   
-    h_cal_1_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
-    h_sim_1_res_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
+    h_cal_1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
+    h_sim_1_res_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
   
     //! Fill Simulation histograms (2nd file)
-    for (int i = 0; i < entries_sim_descent; i++)
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res,2) + pow(b_res/sqrt(event_sim_2),2) + pow(c_res/event_sim_2,2) );
@@ -417,28 +418,28 @@ void DataAnalyser::Analyze()
       h_sim_2_res_up_ch1->Fill(energy);
       h_sim_2_res_up_ch2->Fill(energy);
     }
-    TH1D* h_sim_2_res_filtered = fft(h_sim_2_res, 0.1, thresh_fft_descent_sim, "h_sim_2_res_filtered", "h_sim_2_res_filtered");
-    TH1D* h_sim_2_res_up_ch1_filtered = fft(h_sim_2_res_up_ch1, 0.1, thresh_fft_descent_sim, "h_sim_2_res_up_ch1_filtered", "h_sim_2_res_up_ch1_filtered");
-    TH1D* h_sim_2_res_up_ch2_filtered = fft(h_sim_2_res_up_ch2, 0.1, thresh_fft_descent_sim, "h_sim_2_res_up_ch2_filtered", "h_sim_2_res_up_ch2_filtered");
+    TH1D* h_sim_2_res_filtered = fft(h_sim_2_res, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_filtered", "h_sim_2_res_filtered");
+    TH1D* h_sim_2_res_up_ch1_filtered = fft(h_sim_2_res_up_ch1, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_ch1_filtered", "h_sim_2_res_up_ch1_filtered");
+    TH1D* h_sim_2_res_up_ch2_filtered = fft(h_sim_2_res_up_ch2, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_ch2_filtered", "h_sim_2_res_up_ch2_filtered");
   
-    for (int i = 0; i < entries_sim_descent; i++)
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res_up_sig1,2) + pow(b_res_up_sig1/sqrt(event_sim_2),2) + pow(c_res_up_sig1/event_sim_2,2) );
       h_sim_2_res_up_sig1->Fill(ranGen->Gaus(event_sim_2,sigma));
     }
-    TH1D* h_sim_2_res_up_sig1_filtered = fft(h_sim_2_res_up_sig1, 0.1, thresh_fft_descent_sim, "h_sim_2_res_up_sig1_filtered", "h_sim_2_res_up_sig1_filtered");
+    TH1D* h_sim_2_res_up_sig1_filtered = fft(h_sim_2_res_up_sig1, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_sig1_filtered", "h_sim_2_res_up_sig1_filtered");
   
-    for (int i = 0; i < entries_sim_descent; i++)
+    for (int i = 0; i < config.entries_sim_descent; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res_up_sig2,2) + pow(b_res_up_sig2/sqrt(event_sim_2),2) + pow((c_res_up_sig2)/event_sim_2,2) );
       h_sim_2_res_up_sig2->Fill(ranGen->Gaus(event_sim_2,sigma));
     }
-    TH1D* h_sim_2_res_up_sig2_filtered = fft(h_sim_2_res_up_sig2, 0.1, thresh_fft_descent_sim, "h_sim_2_res_up_sig2_filtered", "h_sim_2_res_up_sig2_filtered");
+    TH1D* h_sim_2_res_up_sig2_filtered = fft(h_sim_2_res_up_sig2, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_sig2_filtered", "h_sim_2_res_up_sig2_filtered");
   
-    h_cal_2_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
-    h_sim_2_res_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
+    h_cal_2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
+    h_sim_2_res_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
   
     //! Delta Chi2
     if(iteration == 2){delta_chi2_1 = abs(chi2(h_cal_1_filtered, h_sim_1_res_filtered) - chi2_1) 
@@ -514,40 +515,40 @@ void DataAnalyser::Analyze()
     c_compare->cd(2)->Update();
   
     //! Chi2(1st file)
-    h_cal_1_up_ch1_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
-    h_sim_1_res_up_ch1_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
+    h_cal_1_up_ch1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
+    h_sim_1_res_up_ch1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
     double chi2_1_up_ch1 = chi2(h_cal_1_up_ch1_filtered, h_sim_1_res_up_ch1_filtered);
   
-    h_cal_1_up_ch2_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
-    h_sim_1_res_up_ch2_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
+    h_cal_1_up_ch2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
+    h_sim_1_res_up_ch2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
     double chi2_1_up_ch2 = chi2(h_cal_1_up_ch2_filtered, h_sim_1_res_up_ch2_filtered);
   
-    h_sim_1_res_up_sig1_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
+    h_sim_1_res_up_sig1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
     double chi2_1_up_sig1 = chi2(h_cal_1_filtered, h_sim_1_res_up_sig1_filtered);
   
-    h_sim_1_res_up_sig2_filtered->GetXaxis()->SetRangeUser(x_min_descent_1, x_max_descent_1);
+    h_sim_1_res_up_sig2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
     double chi2_1_up_sig2 = chi2(h_cal_1_filtered, h_sim_1_res_up_sig2_filtered);
   
     //! Chi2(2nd file)
-    h_cal_2_up_ch1_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
-    h_sim_2_res_up_ch1_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
+    h_cal_2_up_ch1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
+    h_sim_2_res_up_ch1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
     double chi2_2_up_ch1 = chi2(h_cal_2_up_ch1_filtered, h_sim_2_res_up_ch1_filtered);
   
-    h_cal_2_up_ch2_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
-    h_sim_2_res_up_ch2_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
+    h_cal_2_up_ch2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
+    h_sim_2_res_up_ch2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
     double chi2_2_up_ch2 = chi2(h_cal_2_up_ch2_filtered, h_sim_2_res_up_ch2_filtered);
   
-    h_sim_2_res_up_sig1_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
+    h_sim_2_res_up_sig1_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
     double chi2_2_up_sig1 = chi2(h_cal_2_filtered, h_sim_2_res_up_sig1_filtered);
   
-    h_sim_2_res_up_sig2_filtered->GetXaxis()->SetRangeUser(x_min_descent_2, x_max_descent_2);
+    h_sim_2_res_up_sig2_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_2, config.x_max_descent_2);
     double chi2_2_up_sig2 = chi2(h_cal_2_filtered, h_sim_2_res_up_sig2_filtered);
   
     //! Derivative
-    double deri_chi2_up_ch1 = ((chi2_1_up_ch1+chi2_2_up_ch1)-(chi2_1+chi2_2))/step_channel_1;
-    double deri_chi2_up_ch2 = ((chi2_1_up_ch2+chi2_2_up_ch2)-(chi2_1+chi2_2))/step_channel_2;
-    double deri_chi2_up_sig1 = ((chi2_1_up_sig1+chi2_2_up_sig1)-(chi2_1+chi2_2))/step_res_1;
-    double deri_chi2_up_sig2 = ((chi2_1_up_sig2+chi2_2_up_sig2)-(chi2_1+chi2_2))/step_res_2;
+    double deri_chi2_up_ch1 = ((chi2_1_up_ch1+chi2_2_up_ch1)-(chi2_1+chi2_2))/config.step_channel_1;
+    double deri_chi2_up_ch2 = ((chi2_1_up_ch2+chi2_2_up_ch2)-(chi2_1+chi2_2))/config.step_channel_2;
+    double deri_chi2_up_sig1 = ((chi2_1_up_sig1+chi2_2_up_sig1)-(chi2_1+chi2_2))/config.step_res_1;
+    double deri_chi2_up_sig2 = ((chi2_1_up_sig2+chi2_2_up_sig2)-(chi2_1+chi2_2))/config.step_res_2;
   
     // std::cout << "~~~~~~~~~~~CHECK~~~~~~~~~~~~\n";
     // std::cout << "deri_chi2_up_ch1 = " << deri_chi2_up_ch1 << "; deri_chi2_up_ch2 = " << deri_chi2_up_ch2 
@@ -555,14 +556,14 @@ void DataAnalyser::Analyze()
     // std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
 
     //! Moving along the gradient
-    ch1 = ch1 - learning_rate_channel_1*deri_chi2_up_ch1;
-    ch2 = ch2 - learning_rate_channel_2*deri_chi2_up_ch2;
+    ch1 = ch1 - config.learning_rate_channel_1*deri_chi2_up_ch1;
+    ch2 = ch2 - config.learning_rate_channel_2*deri_chi2_up_ch2;
   
-    res_1 = res_1 - learning_rate_res_1*deri_chi2_up_sig1;
-    res_2 = res_2 - learning_rate_res_2*deri_chi2_up_sig2;
+    config.res_1 = config.res_1 - config.learning_rate_res_1*deri_chi2_up_sig1;
+    config.res_2 = config.res_2 - config.learning_rate_res_2*deri_chi2_up_sig2;
 
     std::cout << "ch1 = " << ch1 << "; ch2 = " << ch2 
-    << "\nSig1 = " << res_1 << "; Sig2 = " << res_2 << "\n";
+    << "\nSig1 = " << config.res_1 << "; Sig2 = " << config.res_2 << "\n";
     
     // std::cout << "\ndelta_Chi2_1 = " << delta_chi2_1 
     // << "\ndelta_Chi2_2 = " << delta_chi2_2
@@ -593,7 +594,7 @@ void DataAnalyser::Analyze()
     h_sim_1_res_filtered->GetXaxis()->UnZoom();
     h_cal_1_filtered->SetLineColor(kRed);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_filtered->Scale(scale_sim_1, "noSW2");
+    h_sim_1_res_filtered->Scale(config.scale_sim_1, "noSW2");
     h_sim_1_res_filtered->Draw("same");
   
     TLegend *legend = new TLegend(0.4, 0.55, 0.8, 0.85);
@@ -629,7 +630,7 @@ void DataAnalyser::Analyze()
     h_sim_2_res_filtered->GetXaxis()->UnZoom();
     h_cal_2_filtered->SetLineColor(kRed);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_filtered->Scale(scale_sim_2, "noSW2");
+    h_sim_2_res_filtered->Scale(config.scale_sim_2, "noSW2");
     h_sim_2_res_filtered->Draw("same");
   
     TLegend *legend1 = new TLegend(0.4, 0.55, 0.8, 0.85);
@@ -649,7 +650,7 @@ void DataAnalyser::Analyze()
     c_derivative->cd(1);    
     h_cal_1_up_ch1_filtered->SetLineColor(kRed);
     h_cal_1_up_ch1_filtered->Draw();
-    h_sim_1_res_up_ch1_filtered->Scale(scale_sim_1, "noSW2");
+    h_sim_1_res_up_ch1_filtered->Scale(config.scale_sim_1, "noSW2");
     h_sim_1_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(1)->Modified();
     c_derivative->cd(1)->Update();
@@ -657,21 +658,21 @@ void DataAnalyser::Analyze()
     c_derivative->cd(2);    
     h_cal_1_up_ch2_filtered->SetLineColor(kRed);
     h_cal_1_up_ch2_filtered->Draw();
-    h_sim_1_res_up_ch2_filtered->Scale(scale_sim_1, "noSW2");
+    h_sim_1_res_up_ch2_filtered->Scale(config.scale_sim_1, "noSW2");
     h_sim_1_res_up_ch2_filtered->Draw("same");
     c_derivative->cd(2)->Modified();
     c_derivative->cd(2)->Update();
   
     c_derivative->cd(3);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig1_filtered->Scale(scale_sim_1, "noSW2");
+    h_sim_1_res_up_sig1_filtered->Scale(config.scale_sim_1, "noSW2");
     h_sim_1_res_up_sig1_filtered->Draw("same");
     c_derivative->cd(3)->Modified();
     c_derivative->cd(3)->Update();
   
     c_derivative->cd(4);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig2_filtered->Scale(scale_sim_1, "noSW2");
+    h_sim_1_res_up_sig2_filtered->Scale(config.scale_sim_1, "noSW2");
     h_sim_1_res_up_sig2_filtered->Draw("same");
     c_derivative->cd(4)->Modified();
     c_derivative->cd(4)->Update();
@@ -679,7 +680,7 @@ void DataAnalyser::Analyze()
     c_derivative->cd(5);    
     h_cal_2_up_ch1_filtered->SetLineColor(kRed);
     h_cal_2_up_ch1_filtered->Draw();
-    h_sim_2_res_up_ch1_filtered->Scale(scale_sim_2, "noSW2");
+    h_sim_2_res_up_ch1_filtered->Scale(config.scale_sim_2, "noSW2");
     h_sim_2_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(5)->Modified();
     c_derivative->cd(5)->Update();
@@ -687,34 +688,34 @@ void DataAnalyser::Analyze()
     c_derivative->cd(6);    
     h_cal_2_up_ch2_filtered->SetLineColor(kRed);
     h_cal_2_up_ch2_filtered->Draw();
-    h_sim_2_res_up_ch2_filtered->Scale(scale_sim_2, "noSW2");
+    h_sim_2_res_up_ch2_filtered->Scale(config.scale_sim_2, "noSW2");
     h_sim_2_res_up_ch2_filtered->Draw("same");
     c_derivative->cd(6)->Modified();
     c_derivative->cd(6)->Update();
   
     c_derivative->cd(7);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_up_sig1_filtered->Scale(scale_sim_2, "noSW2");
+    h_sim_2_res_up_sig1_filtered->Scale(config.scale_sim_2, "noSW2");
     h_sim_2_res_up_sig1_filtered->Draw("same");
     c_derivative->cd(7)->Modified();
     c_derivative->cd(7)->Update();
   
     c_derivative->cd(8);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_up_sig2_filtered->Scale(scale_sim_2, "noSW2");
+    h_sim_2_res_up_sig2_filtered->Scale(config.scale_sim_2, "noSW2");
     h_sim_2_res_up_sig2_filtered->Draw("same");
     c_derivative->cd(8)->Modified();
     c_derivative->cd(8)->Update();
   
     if(iteration > 1){
       if (chi2_1 < thresh_delta_chi2_each){
-      learning_rate_channel_1 = 0.;
-      learning_rate_res_1 = 0.;
+      config.learning_rate_channel_1 = 0.;
+      config.learning_rate_res_1 = 0.;
       }
   
       if (chi2_2 < thresh_delta_chi2_each){
-      learning_rate_channel_2 = 0.;
-      learning_rate_res_2 = 0.;
+      config.learning_rate_channel_2 = 0.;
+      config.learning_rate_res_2 = 0.;
       }
     }
   
