@@ -22,7 +22,6 @@ public:
     opt_name_f_sim_2,
     opt_name_f_mea_1,
     opt_name_f_mea_2,
-    opt_channel,
     opt_entries_sim_fft,
     opt_entries_mea_fft,
     opt_entries_sim_descent,

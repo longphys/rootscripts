@@ -199,30 +199,30 @@ void DataAnalyser::Analyze(Config& config)
 	c_fit->Divide(2,1);
 
 	//! Select trees and branches from the files
-	TTree* t_sim_1 = (TTree*) f_sim_1->Get("dEEtree");
-	TTree* t_mea_1 = (TTree*) f_mea_1->Get("AnalysisxTree");
+	TTree* t_sim_1 = (TTree*) f_sim_1->Get("Events");
+	TTree* t_mea_1 = (TTree*) f_mea_1->Get("Events");
 
-	UShort_t event_mea_1[48];
-	t_mea_1->SetBranchAddress("NeEvent.neutAmp[48]", event_mea_1);
+	double event_mea_1;
+	t_mea_1->SetBranchAddress("Amplitude", &event_mea_1);
 
 	double event_sim_1;
-	t_sim_1->SetBranchAddress("Scintillator", &event_sim_1);
+	t_sim_1->SetBranchAddress("Energy", &event_sim_1);
 
-	TTree* t_sim_2 =  (TTree*) f_sim_2->Get("dEEtree");
-	TTree* t_mea_2 =  (TTree*) f_mea_2->Get("AnalysisxTree");
+	TTree* t_sim_2 =  (TTree*) f_sim_2->Get("Events");
+	TTree* t_mea_2 =  (TTree*) f_mea_2->Get("Events");
 
-	UShort_t event_mea_2[48];
-	t_mea_2->SetBranchAddress("NeEvent.neutAmp[48]", event_mea_2);
+	double event_mea_2;
+	t_mea_2->SetBranchAddress("Amplitude", &event_mea_2);
 
 	double event_sim_2;
-	t_sim_2->SetBranchAddress("Scintillator", &event_sim_2);
+	t_sim_2->SetBranchAddress("Energy", &event_sim_2);
 	
 	//! Fill histograms for FFT to estimate Compton edge
 	TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
 
 	for(int i = 0; i < config.entries_mea_fft; i++){
 		t_mea_1->GetEntry(i);
-		h_mea_1_estimate->Fill(event_mea_1[config.channel]);
+		h_mea_1_estimate->Fill(event_mea_1);
 	}
 
 	TH1D* h_mea_1_estimate_filtered = fft(h_mea_1_estimate, config.rate_fft_ini_1, config.thresh_fft_ini_1,
@@ -235,7 +235,7 @@ void DataAnalyser::Analyze(Config& config)
 	TH1D* h_mea_2_estimate = new TH1D("h_mea_2_estimate", "Second measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
 	for(int i = 0; i < config.entries_mea_fft; i++){
 		t_mea_2->GetEntry(i);
-		h_mea_2_estimate->Fill(event_mea_2[config.channel]);
+		h_mea_2_estimate->Fill(event_mea_2);
 	}
 	
 	TH1D* h_mea_2_estimate_filtered = fft(h_mea_2_estimate, config.rate_fft_ini_2, config.thresh_fft_ini_2, "h_mea_2_estimate_filtered", "Second measurement histogram filtered");
@@ -343,9 +343,9 @@ void DataAnalyser::Analyze(Config& config)
     //! Fill experiment histograms (1st file)
     for(int i = 0; i < config.entries_mea_descent; i++){
       t_mea_1->GetEntry(i);
-      h_cal_1->Fill(a*(event_mea_1[config.channel]+0.5) + b);
-      h_cal_1_up_ch1->Fill(a_up_ch1*(event_mea_1[config.channel]+0.5) + b_up_ch1);
-      h_cal_1_up_ch2->Fill(a_up_ch2*(event_mea_1[config.channel]+0.5) + b_up_ch2);
+      h_cal_1->Fill(a*(event_mea_1+0.5) + b);
+      h_cal_1_up_ch1->Fill(a_up_ch1*(event_mea_1+0.5) + b_up_ch1);
+      h_cal_1_up_ch2->Fill(a_up_ch2*(event_mea_1+0.5) + b_up_ch2);
     }
     TH1D* h_cal_1_filtered = fft(h_cal_1, 0.1, config.thresh_fft_descent_mea, "h_cal_1_filtered", "h_cal_1_filtered");
     TH1D* h_cal_1_up_ch1_filtered = fft(h_cal_1_up_ch1, 0.1, config.thresh_fft_descent_mea, "h_cal_1_up_ch1_filtered", "h_cal_1_up_ch1_filtered");
@@ -354,9 +354,9 @@ void DataAnalyser::Analyze(Config& config)
     //! Fill experiment histograms (2nd file)
     for(int i = 0; i < config.entries_mea_descent; i++){
       t_mea_2->GetEntry(i);
-      h_cal_2->Fill(a*(event_mea_2[config.channel]+0.5) + b);
-      h_cal_2_up_ch1->Fill(a_up_ch1*(event_mea_2[config.channel]+0.5) + b_up_ch1);
-      h_cal_2_up_ch2->Fill(a_up_ch2*(event_mea_2[config.channel]+0.5) + b_up_ch2);
+      h_cal_2->Fill(a*(event_mea_2+0.5) + b);
+      h_cal_2_up_ch1->Fill(a_up_ch1*(event_mea_2+0.5) + b_up_ch1);
+      h_cal_2_up_ch2->Fill(a_up_ch2*(event_mea_2+0.5) + b_up_ch2);
     }
     TH1D* h_cal_2_filtered = fft(h_cal_2, 0.1, config.thresh_fft_descent_mea, "h_cal_2_filtered", "h_cal_2_filtered");
     TH1D* h_cal_2_up_ch1_filtered = fft(h_cal_2_up_ch1, 0.1, config.thresh_fft_descent_mea, "h_cal_2_up_ch1_filtered", "h_cal_2_up_ch1_filtered");

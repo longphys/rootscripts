@@ -6,7 +6,6 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
     {"name_f_sim_2", required_argument, 0, opt_name_f_sim_2},
     {"name_f_mea_1", required_argument, 0, opt_name_f_mea_1},
     {"name_f_mea_2", required_argument, 0, opt_name_f_mea_2},
-    {"channel", required_argument, 0, opt_channel},
     {"entries_sim_fft", required_argument, 0, opt_entries_sim_fft},
     {"entries_mea_fft", required_argument, 0, opt_entries_mea_fft},
     {"entries_sim_descent", required_argument, 0, opt_entries_sim_descent},
@@ -101,10 +100,6 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
       }
       break;
             
-    case opt_channel:
-      WriteOutput(optarg, config.channel, config.channel, "channel");
-      break;
-      
     case opt_entries_sim_fft:
       WriteOutput(optarg, config.entries_sim_fft, config.entries_sim_fft, "number of simulation entries for FFT");
       break;

@@ -11,9 +11,6 @@ struct Config{
   std::string name_f_mea_1 = "";
   std::string name_f_mea_2 = "";
 
-  // Default channel of the measurement file
-  int channel = 0;
-
   // Default number of entries for FFT
   int entries_sim_fft = 100000;
   int entries_mea_fft = 100000;
