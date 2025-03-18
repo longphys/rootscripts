@@ -65,10 +65,6 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
       }
       break;
 
-    case opt_ascii:
-    WriteOutput(optarg, config.ascii, config.ascii, "ASCII option");
-    break;
-
     case opt_name_f_sim_2:
       if (optarg == nullptr || optarg[0] == '-'){
         std::cerr << "Error: --opt_name_f_sim_2 requires an argument but none was provided.\n";
@@ -81,15 +77,24 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
       }
       break;
         
+    case opt_ascii:
+    WriteOutput(optarg, config.ascii, config.ascii, "ASCII option");
+    break;
+
     case opt_name_f_mea_1:
       if (optarg == nullptr || optarg[0] == '-'){
         std::cerr << "Error: --opt_name_f_mea_1 requires an argument but none was provided.\n";
         return -1;
       }
       config.name_f_mea_1 = optarg;
-      if (!CheckRootFile(config.name_f_mea_1.c_str())){
-        std::cerr << "Error: Invalid measurement file 1: " << config.name_f_mea_1 << std::endl;
-        return -1;
+      if (config.ascii == 0){
+        if (!CheckRootFile(config.name_f_mea_1.c_str())){
+          std::cerr << "Error: Invalid measurement file 1: " << config.name_f_mea_1 << std::endl;
+          return -1;
+        }
+      }
+      else {
+        std::cerr << "An ASCII type was used as measurement file 1: " << config.name_f_mea_1 << std::endl;
       }
       break;
 
@@ -99,9 +104,14 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
         return -1;
       }
       config.name_f_mea_2 = optarg;
-      if (!CheckRootFile(config.name_f_mea_2.c_str())){
-        std::cerr << "Error: Invalid measurement file 2: " << config.name_f_mea_2 << std::endl;
-        return -1;
+      if (config.ascii == 0){
+        if (!CheckRootFile(config.name_f_mea_2.c_str())){
+          std::cerr << "Error: Invalid measurement file 2: " << config.name_f_mea_2 << std::endl;
+          return -1;
+        }
+      }
+      else {
+        std::cerr << "An ASCII type was used as measurement file 2: " << config.name_f_mea_2 << std::endl;
       }
       break;
             

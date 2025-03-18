@@ -14,8 +14,8 @@ void refill_copy()
   timer->Start();
 
   //! Files and trees
-  TFile* fileOpen = new TFile("./measurement_Cs137.root", "read");
-  // TFile* fileOpen = new TFile("./measurement_Na22.root", "read");
+  // TFile* fileOpen = new TFile("./measurement_Cs137.root", "read");
+  TFile* fileOpen = new TFile("./measurement_Na22.root", "read");
   TTree* treeOpen =  (TTree*) fileOpen->Get("Events");
 
   //! Get Events
@@ -26,7 +26,11 @@ void refill_copy()
   double x_max = 1000.;
   int bin = x_max-x_min;
   TH1D* histogram = new TH1D("histogram", "histogram", bin, x_min, x_max);
-  for(int i = 0; i<treeOpen->GetEntries(); i++){
+  
+  int entries = treeOpen->GetEntries();
+  entries = 500000;
+
+  for(int i = 0; i<entries; i++){
     if(i%100000==0){std::cout << "Event: " << i << "\n";}
     treeOpen->GetEntry(i);
     histogram->Fill(eventOpen);
@@ -36,7 +40,8 @@ void refill_copy()
   histogram->Draw();
 
   //! Fill experiment histograms
-  std::ofstream fileSave("measurement_ascii_Cs137.txt"); // Open file for writing
+  // std::ofstream fileSave("measurement_ascii_Cs137.txt"); // Open file for writing
+  std::ofstream fileSave("measurement_ascii_Na22.txt");
 
   std::cout << "histogram->GetXaxis()->GetXmin() = " << histogram->GetXaxis()->GetXmin() << "\n";
   std::cout << "histogram->GetXaxis()->GetXmax() = " << histogram->GetXaxis()->GetXmax() << "\n";  
@@ -48,7 +53,8 @@ void refill_copy()
 
   fileSave.close();
 
-  std::ifstream inputFile("measurement_ascii_Cs137.txt");
+  // std::ifstream inputFile("measurement_ascii_Cs137.txt");
+  std::ifstream inputFile("measurement_ascii_Na22.txt");
 
   int x;
   double y;
