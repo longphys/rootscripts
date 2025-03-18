@@ -1,6 +1,9 @@
 #ifndef DATAANALYSER_HH
 #define DATAANALYSER_HH
 
+#include <iostream>
+#include <fstream>
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TF1.h"

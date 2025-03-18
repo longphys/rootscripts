@@ -191,80 +191,122 @@ void DataAnalyser::Analyze(Config& config)
 	//! Read the simulation and measurement files
 	TFile* f_sim_1 = new TFile(config.name_f_sim_1.c_str(), "read");
 	TFile* f_sim_2 = new TFile(config.name_f_sim_2.c_str(), "read");
-	
-	TFile* f_mea_1 = new TFile(config.name_f_mea_1.c_str(), "read");
-	TFile* f_mea_2 = new TFile(config.name_f_mea_2.c_str(), "read");
+
+  TCanvas* c_derivative = new TCanvas("c_derivative", "Derivative check", 1000, 500);
+  c_derivative->Divide(2,2);
+
+  int ch1;
+  int ch2;
+
+  if (config.ascii == 0){
+    TFile* f_mea_1 = new TFile(config.name_f_mea_1.c_str(), "read");
+    TFile* f_mea_2 = new TFile(config.name_f_mea_2.c_str(), "read");
+
+    TTree* t_mea_1 = (TTree*) f_mea_1->Get("Events");
+    TTree* t_mea_2 =  (TTree*) f_mea_2->Get("Events");
+
+    double event_mea_1;
+    double event_mea_2;
+    
+    t_mea_2->SetBranchAddress("Amplitude", &event_mea_2);
+    t_mea_1->SetBranchAddress("Amplitude", &event_mea_1);
+
+	  //! Fill histograms for FFT to estimate Compton edge
+    TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
+  
+    for(int i = 0; i < config.entries_mea_fft; i++){
+      t_mea_1->GetEntry(i);
+      h_mea_1_estimate->Fill(event_mea_1);
+    }
+  
+    TH1D* h_mea_1_estimate_filtered = fft(h_mea_1_estimate, config.rate_fft_ini_1, config.thresh_fft_ini_1,
+    "h_mea_1_estimate_filtered", "First measurement histogram filtered");
+    
+    h_mea_1_estimate_filtered->GetXaxis()->SetTitle("Channel");
+    h_mea_1_estimate_filtered->GetYaxis()->SetTitle("Count");
+    TH1D* h_mea_1_estimate_diff = Diff(h_mea_1_estimate_filtered, "h_mea_1_estimate_diff", "Derivative of First measurement histogram");
+  
+    TH1D* h_mea_2_estimate = new TH1D("h_mea_2_estimate", "Second measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
+    for(int i = 0; i < config.entries_mea_fft; i++){
+      t_mea_2->GetEntry(i);
+      h_mea_2_estimate->Fill(event_mea_2);
+    }
+    
+    TH1D* h_mea_2_estimate_filtered = fft(h_mea_2_estimate, config.rate_fft_ini_2, config.thresh_fft_ini_2, "h_mea_2_estimate_filtered", "Second measurement histogram filtered");
+    h_mea_2_estimate_filtered->GetXaxis()->SetTitle("Channel");
+    h_mea_2_estimate_filtered->GetYaxis()->SetTitle("Count");
+    TH1D* h_mea_2_estimate_diff = Diff(h_mea_2_estimate_filtered, "h_mea_2_estimate_diff", "Derivative of Second measurement histogram");
+
+	  //! Show derivatives on a canvas
+    c_derivative->cd(1);
+    h_mea_1_estimate_filtered->Draw();
+    c_derivative->cd(3);
+    h_mea_1_estimate_diff->Draw();
+    h_mea_1_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_1, config.x_max_fft_1);
+    int ch1 = h_mea_1_estimate_diff->GetMinimumBin() + config.x_min_mea;
+    std::cout << "ch1 = " << ch1 << "\n";
+
+    c_derivative->cd(2);
+    h_mea_2_estimate_filtered->Draw();
+    c_derivative->cd(4);
+    h_mea_2_estimate_diff->Draw();
+    h_mea_2_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_2, config.x_max_fft_2);
+    int ch2 = h_mea_2_estimate_diff->GetMinimumBin() + config.x_min_mea;
+    std::cout << "ch2 = " << ch2 << "\n";
+
+    c_derivative->Modified();
+    c_derivative->Update();
+  }
+  else{
+    std::ifstream f_mea_1(config.name_f_mea_1.c_str());
+    std::ifstream f_mea_2(config.name_f_mea_2.c_str());
+
+    int x1,x2;
+    double y1,y2;
+    std::vector<int> bin_input1, bin_input2;
+    std::vector<double> content_input1, content_input2;
+    
+    while(f_mea_1 >> x1 >> y1){
+      // std::cout << x1 << " " << y1 << "\n";
+      bin_input1.push_back(x1);
+      content_input1.push_back(y1);
+    }
+
+    while(f_mea_2 >> x2 >> y2){
+      // std::cout << x2 << " " << y2 << "\n";
+      bin_input1.push_back(x2);
+      content_input1.push_back(y2);
+    }
+  
+    // std::cout << "bin_input.size() = " << bin_input.size() << "\n";
+    // std::cout << "bin_input[0] = " << bin_input[0] << "\n";
+    // std::cout << "bin_input[bin_input.size()-1] = " << bin_input[bin_input.size()-1] << "\n";
+  
+    TH1D* new_histogram = new TH1D("new_histogram", "new_histogram", bin_input.size(), bin_input[0], bin_input[bin_input.size()-1]);
+    for (int i=1; i<=bin_input.size(); i++){
+      new_histogram->SetBinContent(i, content_input[i-1]);
+    }
+  
+    TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", bin_input1.size(), config.x_min_mea, config.x_max_mea);
+ 
+
+    TCanvas* canvas_1 = new TCanvas();
+    canvas_1->cd();
+    new_histogram->Draw();
+  }
 
 	TCanvas* c_fit = new TCanvas("c_fit", "c_fit", 1000, 500);
 	c_fit->Divide(2,1);
 
 	//! Select trees and branches from the files
 	TTree* t_sim_1 = (TTree*) f_sim_1->Get("Events");
-	TTree* t_mea_1 = (TTree*) f_mea_1->Get("Events");
-
-	double event_mea_1;
-	t_mea_1->SetBranchAddress("Amplitude", &event_mea_1);
+	TTree* t_sim_2 =  (TTree*) f_sim_2->Get("Events");
 
 	double event_sim_1;
-	t_sim_1->SetBranchAddress("Energy", &event_sim_1);
-
-	TTree* t_sim_2 =  (TTree*) f_sim_2->Get("Events");
-	TTree* t_mea_2 =  (TTree*) f_mea_2->Get("Events");
-
-	double event_mea_2;
-	t_mea_2->SetBranchAddress("Amplitude", &event_mea_2);
-
 	double event_sim_2;
+
+	t_sim_1->SetBranchAddress("Energy", &event_sim_1);
 	t_sim_2->SetBranchAddress("Energy", &event_sim_2);
-	
-	//! Fill histograms for FFT to estimate Compton edge
-	TH1D* h_mea_1_estimate = new TH1D("h_mea_1_estimate", "First measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
-
-	for(int i = 0; i < config.entries_mea_fft; i++){
-		t_mea_1->GetEntry(i);
-		h_mea_1_estimate->Fill(event_mea_1);
-	}
-
-	TH1D* h_mea_1_estimate_filtered = fft(h_mea_1_estimate, config.rate_fft_ini_1, config.thresh_fft_ini_1,
-	"h_mea_1_estimate_filtered", "First measurement histogram filtered");
-	
-	h_mea_1_estimate_filtered->GetXaxis()->SetTitle("Channel");
-	h_mea_1_estimate_filtered->GetYaxis()->SetTitle("Count");
-	TH1D* h_mea_1_estimate_diff = Diff(h_mea_1_estimate_filtered, "h_mea_1_estimate_diff", "Derivative of First measurement histogram");
-
-	TH1D* h_mea_2_estimate = new TH1D("h_mea_2_estimate", "Second measurement histogram", config.bin_mea, config.x_min_mea, config.x_max_mea);
-	for(int i = 0; i < config.entries_mea_fft; i++){
-		t_mea_2->GetEntry(i);
-		h_mea_2_estimate->Fill(event_mea_2);
-	}
-	
-	TH1D* h_mea_2_estimate_filtered = fft(h_mea_2_estimate, config.rate_fft_ini_2, config.thresh_fft_ini_2, "h_mea_2_estimate_filtered", "Second measurement histogram filtered");
-	h_mea_2_estimate_filtered->GetXaxis()->SetTitle("Channel");
-	h_mea_2_estimate_filtered->GetYaxis()->SetTitle("Count");
-	TH1D* h_mea_2_estimate_diff = Diff(h_mea_2_estimate_filtered, "h_mea_2_estimate_diff", "Derivative of Second measurement histogram");
-	
-	//! Show derivatives on a canvas
-	TCanvas* c_derivative = new TCanvas("c_derivative", "Derivative check", 1000, 500);
-	c_derivative->Divide(2,2);
-	c_derivative->cd(1);
-	h_mea_1_estimate_filtered->Draw();
-	c_derivative->cd(3);
-	h_mea_1_estimate_diff->Draw();
-	h_mea_1_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_1, config.x_max_fft_1);
-	int ch1 = h_mea_1_estimate_diff->GetMinimumBin() + config.x_min_mea;
-	std::cout << "ch1 = " << ch1 << "\n";
-
-	c_derivative->cd(2);
-	h_mea_2_estimate_filtered->Draw();
-	c_derivative->cd(4);
-	h_mea_2_estimate_diff->Draw();
-	h_mea_2_estimate_diff->GetXaxis()->SetRangeUser(config.x_min_fft_2, config.x_max_fft_2);
-	int ch2 = h_mea_2_estimate_diff->GetMinimumBin() + config.x_min_mea;
-	std::cout << "ch2 = " << ch2 << "\n";
-
-	c_derivative->Modified();
-	c_derivative->Update();
-	//! cShow2 is c_derivative
 
   //! Canvas to compare measurement and simulation spectrum while calibrating
 	TCanvas* c_compare = new TCanvas("c_compare", "Compare Spectrum", 1800, 1000);
