@@ -20,6 +20,7 @@ public:
   enum OptionIDs {
     opt_name_f_sim_1 = 1000,
     opt_name_f_sim_2,
+    opt_ascii,
     opt_name_f_mea_1,
     opt_name_f_mea_2,
     opt_entries_sim_fft,

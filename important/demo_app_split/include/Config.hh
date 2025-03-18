@@ -5,6 +5,9 @@
 #include <string>
 
 struct Config{
+  // Choice of using an ascii measurement file
+  int ascii = 0;
+
   // Name of input file
   std::string name_f_sim_1 = "";
   std::string name_f_sim_2 = "";

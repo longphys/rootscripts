@@ -4,6 +4,7 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
   static struct option longOptions[] = {
     {"name_f_sim_1", required_argument, 0, opt_name_f_sim_1},
     {"name_f_sim_2", required_argument, 0, opt_name_f_sim_2},
+    {"ascii", required_argument, 0, opt_ascii},
     {"name_f_mea_1", required_argument, 0, opt_name_f_mea_1},
     {"name_f_mea_2", required_argument, 0, opt_name_f_mea_2},
     {"entries_sim_fft", required_argument, 0, opt_entries_sim_fft},
@@ -63,6 +64,10 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
         return -1;
       }
       break;
+
+    case opt_ascii:
+    WriteOutput(optarg, config.ascii, config.ascii, "ASCII option");
+    break;
 
     case opt_name_f_sim_2:
       if (optarg == nullptr || optarg[0] == '-'){
