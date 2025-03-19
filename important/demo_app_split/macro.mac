@@ -1,11 +1,11 @@
 --name_f_sim_1 ../simulation_Cs137.root
 --name_f_sim_2 ../simulation_Na22.root
-#--ascii 0
---ascii 1
-#--name_f_mea_1 ../measurement_Cs137.root
-#--name_f_mea_2 ../measurement_Na22.root
---name_f_mea_1 ../measurement_ascii_Cs137.txt
---name_f_mea_2 ../measurement_ascii_Na22.txt
+--ascii 0
+#--ascii 1
+--name_f_mea_1 ../measurement_Cs137.root
+--name_f_mea_2 ../measurement_Na22.root
+#--name_f_mea_1 ../measurement_ascii_Cs137.txt
+#--name_f_mea_2 ../measurement_ascii_Na22.txt
 --entries_sim_fft 100000
 --entries_mea_fft 100000
 --entries_sim_descent 500000
@@ -17,7 +17,7 @@
 --energy_1 0.477
 --energy_2 1.061
 --res_1 8.
---res_2 5.
+--res_2 6.
 --x_min_fft_1 200
 --x_max_fft_1 1000
 --x_min_fft_2 300
@@ -46,8 +46,3 @@
 --scale_sim_2 4.2
 --scale_mea_1 1.
 --scale_mea_2 1.
-
-#~/data/simfiles/withAl_simCo60_1.root
-#~/data/simfiles/withAl_simNa22_1.root
-#~/data/expfiles/time/5/plastic_detectors_Cs137_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root
-#~/data/expfiles/time/5/plastic_detectors_Na22_ch0HV1671_ch1HV1885_ch2HV1800_ch0_9837_ch1_9729_ch2_9419_run_0_0001.root
