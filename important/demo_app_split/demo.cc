@@ -10,6 +10,7 @@
 #include "TGraph.h"
 #include "TRandom3.h"
 #include "TLegend.h"
+#include "TStopwatch.h"
 
 #include "ArgumentParser.hh"
 #include "MacroReader.hh"
@@ -32,12 +33,15 @@ bool CheckRootFile(const char* filename) {
 
 int main(int argc, char **argv)
 {
+  auto timer = new TStopwatch();
+  timer->Start();
+
   if (argc != 2) {
       std::cerr << "Error: Expected exactly one argument (macro file) or --help.\n";
       return 1;
   }
 
-  // If the user asks for help, display usage info and exit
+  //! If the user asks for help, display usage info and exit
   if (std::string(argv[1]) == "--help") {
       std::cout << "Usage: ./demo macro.mac or ./demo --help\n"
                 << "  macro.mac: A script file containing arguments\n"
@@ -45,11 +49,11 @@ int main(int argc, char **argv)
       return 0;
   }
 
-  // Otherwise, assume the argument is a macro file and process it
+  //! Otherwise, assume the argument is a macro file and process it
   MacroReader aMacroReader;
   std::vector<std::string> args = aMacroReader.Read(argv[1]);
 
-  // Convert vector of strings to array of C-style strings
+  //! Convert vector of strings to array of C-style strings
   std::vector<char*> c_args;
   c_args.push_back(argv[0]); // Program name
   for (std::string& arg : args) {
@@ -65,16 +69,16 @@ int main(int argc, char **argv)
   ArgumentParser anArgumentParser;
   if (anArgumentParser.Parse(new_argc, new_argv, config) != 0) return 1;
 
-  // Initialize application
+  //! Initialize application
   TApplication app("app", &argc, argv);
 
-	std::cerr << "\nMain is running...\n";
-
-  // Analyze the data
+  //! Analyze the data
   DataAnalyser aDataAnalyser;
   aDataAnalyser.Analyze(config);
-  std::cerr << "\nRun success.\n";
+  std::cout << "\nRun success.\n";
+  std::cout << "Time: " << timer->RealTime() << " seconds \n";  
   app.Run();
+
 
   return 0;
 }

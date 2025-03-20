@@ -15,15 +15,17 @@ Run the Program:
   ./demo macro.file
 
 The application accepts input arguments through a macro file.
-An example of a macro file is included.
-All arguments provided in the example is required.
+All arguments must be filled for the application to run.
+Lines that start with the symbol "--" are treated as arguments.
+Lines that start with the symbol "#" are treated as comments.
+Examples of measurement files (ROOT and ASCII type), simulation files and a macro file are included in the root folder of the application.
 
-Below is a list of available arguments and their descriptions:
-  --name_f_sim_1 <path> – Path to the first simulation ROOT file.
-  --name_f_sim_2 <path> – Path to the second simulation ROOT file.
-  --name_f_mea_1 <path> – Path to the first measurement ROOT file.
-  --name_f_mea_2 <path> – Path to the second measurement ROOT file.
-  --channel <int> - Channel of interest of the measurement file.
+Below is a list of the arguments and their descriptions:
+  --name_f_sim_1 <path> - Path to the first simulation ROOT file.
+  --name_f_sim_2 <path> - Path to the second simulation ROOT file.
+  --ascii <int> - The choice to use a ROOT type or ASCII type for the measurement file. (ascii = 0 for ROOT, ascii = other for ASCII)
+  --name_f_mea_1 <path> - Path to the first measurement ROOT file.
+  --name_f_mea_2 <path> - Path to the second measurement ROOT file.
   --entries_sim_fft <int> - Number of entries from the simulation file for quick Fast Fourier Transform (FFT) to perform the first calibration.
   --entries_mea_fft <int> - Number of entries from the measurement file for quick FFT to perform the first calibration.
   --entries_sim_descent <int> - Number of entries from the simulation file for Gradient descent to perform up to the final calibration.
