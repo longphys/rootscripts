@@ -67,7 +67,8 @@ public:
 
   template <typename T>
   void WriteOutput(const char* optarg, T& variable, T defaultValue, const std::string& name, const std::string& unit = ""){
-    if (optarg == nullptr || optarg[0] == '-') {
+    // if (optarg == nullptr || optarg[0] == '-') {
+    if (optarg == nullptr) {
       std::cerr << "Default " << name << " used: " << defaultValue << " " << unit << "\n";
       variable = defaultValue;
     } else {

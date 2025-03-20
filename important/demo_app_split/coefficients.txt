@@ -1,0 +1,3 @@
+The function used to perform energy calibration is a linear equation E = a*Ch + b
+a = 0.00234538
+b = -0.18557

@@ -345,6 +345,23 @@ void DataAnalyser::Analyze(Config& config)
 	double thresh_delta_chi2_each = 0.5;
 	int iteration = 1;
 
+  //! Option to use all the events in the file for the iterations
+  int entries_mea_descent_used_1 = config.entries_mea_descent;
+  int entries_mea_descent_used_2 = config.entries_mea_descent;  
+  if (config.entries_mea_descent < 0){
+    entries_mea_descent_used_1 = t_mea_1->GetEntries();
+    entries_mea_descent_used_2 = t_mea_2->GetEntries();
+    std::cerr << "All events are used for measurement file 1: " << entries_mea_descent_used_1 << "; and measurement file 2: " << entries_mea_descent_used_2 << "\n";
+  }
+
+  int entries_sim_descent_used_1 = config.entries_sim_descent;
+  int entries_sim_descent_used_2 = config.entries_sim_descent;  
+  if (config.entries_sim_descent < 0){
+    entries_sim_descent_used_1 = t_sim_1->GetEntries();
+    entries_sim_descent_used_2 = t_sim_2->GetEntries();
+    std::cerr << "All events are used for simulation file 1: " << entries_sim_descent_used_1 << "; and simulation file 2: " << entries_sim_descent_used_2 << "\n";
+  }
+
 	while (delta_chi2>thresh_delta_chi2){
     std::cout << "\nIteration " << iteration << ":\n";
   
@@ -398,13 +415,13 @@ void DataAnalyser::Analyze(Config& config)
 
     //! Fill measurement histograms (1st and 2nd file)
     if (config.ascii == 0){
-      for(int i = 0; i < config.entries_mea_descent; i++){
+      for(int i = 0; i < entries_mea_descent_used_1; i++){
         t_mea_1->GetEntry(i);
         h_cal_1->Fill(a*(event_mea_1+0.5) + b);
         h_cal_1_up_ch1->Fill(a_up_ch1*(event_mea_1+0.5) + b_up_ch1);
         h_cal_1_up_ch2->Fill(a_up_ch2*(event_mea_1+0.5) + b_up_ch2);
       }
-      for(int i = 0; i < config.entries_mea_descent; i++){
+      for(int i = 0; i < entries_mea_descent_used_2; i++){
         t_mea_2->GetEntry(i);
         h_cal_2->Fill(a*(event_mea_2+0.5) + b);
         h_cal_2_up_ch1->Fill(a_up_ch1*(event_mea_2+0.5) + b_up_ch1);
@@ -446,7 +463,7 @@ void DataAnalyser::Analyze(Config& config)
   
     TRandom3* ranGen = new TRandom3();
     //! Fill Simulation histograms (1st file)
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_1; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res,2) + pow(b_res/sqrt(event_sim_1),2) + pow(c_res/event_sim_1,2) );
@@ -458,7 +475,7 @@ void DataAnalyser::Analyze(Config& config)
     TH1D* h_sim_1_res_filtered = fft(h_sim_1_res, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_filtered", "h_sim_1_res_filtered");
     TH1D* h_sim_1_res_up_ch1_filtered = fft(h_sim_1_res_up_ch1, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_ch1_filtered", "h_sim_1_res_up_ch1_filtered");
     TH1D* h_sim_1_res_up_ch2_filtered = fft(h_sim_1_res_up_ch2, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_ch2_filtered", "h_sim_1_res_up_ch2_filtered");    
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_1; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res_up_sig1,2) + pow(b_res_up_sig1/sqrt(event_sim_1),2) + pow(c_res_up_sig1/event_sim_1,2) );
@@ -466,7 +483,7 @@ void DataAnalyser::Analyze(Config& config)
     }
     TH1D* h_sim_1_res_up_sig1_filtered = fft(h_sim_1_res_up_sig1, 0.1, config.thresh_fft_descent_sim, "h_sim_1_res_up_sig1_filtered", "h_sim_1_res_up_sig1_filtered");
   
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_1; i++)
     {
       t_sim_1->GetEntry(i);
       double sigma = event_sim_1*sqrt( pow(a_res_up_sig2,2) + pow(b_res_up_sig2/sqrt(event_sim_1),2) + pow((c_res_up_sig2)/event_sim_1,2) );
@@ -478,7 +495,7 @@ void DataAnalyser::Analyze(Config& config)
     h_sim_1_res_filtered->GetXaxis()->SetRangeUser(config.x_min_descent_1, config.x_max_descent_1);
   
     //! Fill Simulation histograms (2nd file)
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_2; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res,2) + pow(b_res/sqrt(event_sim_2),2) + pow(c_res/event_sim_2,2) );
@@ -491,7 +508,7 @@ void DataAnalyser::Analyze(Config& config)
     TH1D* h_sim_2_res_up_ch1_filtered = fft(h_sim_2_res_up_ch1, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_ch1_filtered", "h_sim_2_res_up_ch1_filtered");
     TH1D* h_sim_2_res_up_ch2_filtered = fft(h_sim_2_res_up_ch2, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_ch2_filtered", "h_sim_2_res_up_ch2_filtered");
   
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_2; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res_up_sig1,2) + pow(b_res_up_sig1/sqrt(event_sim_2),2) + pow(c_res_up_sig1/event_sim_2,2) );
@@ -499,7 +516,7 @@ void DataAnalyser::Analyze(Config& config)
     }
     TH1D* h_sim_2_res_up_sig1_filtered = fft(h_sim_2_res_up_sig1, 0.1, config.thresh_fft_descent_sim, "h_sim_2_res_up_sig1_filtered", "h_sim_2_res_up_sig1_filtered");
   
-    for (int i = 0; i < config.entries_sim_descent; i++)
+    for (int i = 0; i < entries_sim_descent_used_2; i++)
     {
       t_sim_2->GetEntry(i);
       double sigma = event_sim_2*sqrt( pow(a_res_up_sig2,2) + pow(b_res_up_sig2/sqrt(event_sim_2),2) + pow((c_res_up_sig2)/event_sim_2,2) );
@@ -828,5 +845,17 @@ void DataAnalyser::Analyze(Config& config)
     }
     else{}
     iteration++;
-    }
+  }
+  
+  double final_energy_calibration_coef_a = fit_energy(ch1, ch2, c_fit, 0, config);
+  double final_energy_calibration_coef_b = fit_energy(ch1, ch2, c_fit, 1, config);
+
+  std::cout << "\nCoefficients are: a = " << final_energy_calibration_coef_a << "; b = " << final_energy_calibration_coef_b << "\n";
+
+  std::ofstream fileSave("../coefficients.txt");
+  fileSave << "The function used to perform energy calibration is a linear equation E = a*Ch + b\n";
+  fileSave << "a = " << final_energy_calibration_coef_a << "\n";
+  fileSave << "b = " << final_energy_calibration_coef_b << "\n";
+
+  fileSave.close();
 }
