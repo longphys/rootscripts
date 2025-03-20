@@ -1,35 +1,42 @@
-Requirements:
+# This application is used to perform energy calibration based on 2 measurements of calibration sources.
+# Requirements:
 
   CMake ≥ 3.10
   C++ Compiler (GCC/Clang/MSVC) supporting C++17
   ROOT Framework version 6.30.02
 
-Build the Application:
+# Build the Application:
 
   mkdir build && cd build
   cmake ..
   make
 
-Run the Program:
+# Run the Program:
 
   ./demo macro.file
 
-The application accepts input arguments through a macro file.
-All arguments must be filled for the application to run.
-Lines that start with the symbol "--" are treated as arguments.
-Lines that start with the symbol "#" are treated as comments.
-Examples of measurement files (ROOT and ASCII type), simulation files and a macro file are included in the root folder of the application.
+# The result of calibration coefficients will be showed on the terminal and saved in a "coefficients.txt" file as default.
 
-Below is a list of the arguments and their descriptions:
+# The application accepts input arguments through a macro file.
+# All arguments must be filled for the application to run.
+# Lines that start with the symbol "--" are treated as arguments.
+# Lines that start with the symbol "#" are treated as comments.
+
+# The example ASCII files represent the accquired energy spectra from a measurement.
+# The first columnn represents the bin corresponds to amplitude or channel, and the second column represents the height of the bin.
+# Examples of measurement files (ROOT and ASCII type), simulation files and a macro file are included in the root folder of the application.
+
+# Below is a list of the arguments and their descriptions:
   --name_f_sim_1 <path> - Path to the first simulation ROOT file.
   --name_f_sim_2 <path> - Path to the second simulation ROOT file.
-  --ascii <int> - The choice to use a ROOT type or ASCII type for the measurement file. (ascii = 0 for ROOT, ascii = other for ASCII)
+  --ascii <int> - The choice to use a ROOT type or ASCII type for the measurement file. (0 for ROOT, other for ASCII)
   --name_f_mea_1 <path> - Path to the first measurement ROOT file.
   --name_f_mea_2 <path> - Path to the second measurement ROOT file.
   --entries_sim_fft <int> - Number of entries from the simulation file for quick Fast Fourier Transform (FFT) to perform the first calibration.
   --entries_mea_fft <int> - Number of entries from the measurement file for quick FFT to perform the first calibration.
   --entries_sim_descent <int> - Number of entries from the simulation file for Gradient descent to perform up to the final calibration.
   --entries_mea_descent <int> - Number of entries from the measurement file for Gradient descent to perform up to the final calibration.
+# when "entries_sim_descent" and "entries_sim_descent" arguments are used with variables below 0, all events available in the files will be used.
   --x_min_sim <double> - Lower limit of the simulation file histogram. (in MeV)
   --x_max_sim <double> - Upper limit of the simulation file histogram. (in MeV)
   --x_min_mea <double> - Lower limit of the measurement file histogram. (in channels)
