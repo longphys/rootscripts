@@ -1,11 +1,11 @@
 --name_f_sim_1 ../simulation_Cs137.root
 --name_f_sim_2 ../simulation_Na22.root
-#--ascii 0
---ascii 1
-#--name_f_mea_1 ../measurement_Cs137.root
-#--name_f_mea_2 ../measurement_Na22.root
---name_f_mea_1 ../measurement_ascii_Cs137.txt
---name_f_mea_2 ../measurement_ascii_Na22.txt
+--ascii 0
+#--ascii 1
+--name_f_mea_1 ../measurement_Cs137.root
+--name_f_mea_2 ../measurement_Na22.root
+#--name_f_mea_1 ../measurement_ascii_Cs137.txt
+#--name_f_mea_2 ../measurement_ascii_Na22.txt
 --entries_sim_fft 100000
 --entries_mea_fft 100000
 --entries_sim_descent 500000

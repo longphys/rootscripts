@@ -1,5 +1,19 @@
 #include "DataAnalyser.hh"
 
+double final_energy_calibration_coef_a;
+double final_energy_calibration_coef_b;
+
+double final_energy_calibration_coef_a_error;
+double final_energy_calibration_coef_b_error;
+
+double final_energy_resolution_coef_a;
+double final_energy_resolution_coef_b;
+double final_energy_resolution_coef_c;
+
+double final_energy_resolution_coef_a_error;
+double final_energy_resolution_coef_b_error;
+double final_energy_resolution_coef_c_error;
+
 // Function that performs fast fourier transformation (FFT) on a histogram h_channel.
 TH1D* DataAnalyser::fft(TH1D* h_channel, double para_k, double para_c, std::string name_h_channel, std::string title_h_channel)
 {
@@ -143,6 +157,8 @@ double fit_energy(int channel_1, int channel_2, TCanvas* c_fit, int i, const Con
 
 	double coef_a = f_linear->GetParameter(0);
 	double coef_b = f_linear->GetParameter(1);
+	double coef_a_error = f_linear->GetParError(0);
+	double coef_b_error = f_linear->GetParError(1);
 
 	c_fit->Modified();
 	c_fit->Update();
@@ -151,7 +167,9 @@ double fit_energy(int channel_1, int channel_2, TCanvas* c_fit, int i, const Con
 	delete f_linear;
 
 	if(i == 0){return coef_a;}
-	else{return coef_b;}
+  else if(i == 1){return coef_b;}
+  else if(i == 2){return coef_a_error;}
+	else{return coef_b_error;}
 }
 
 // Function that performs calibration of energy resolution and returns coefficients.
@@ -169,6 +187,9 @@ double fit_energy_res(double res_sig_1, double res_sig_2, TH1D* h_1, TH1D* h_2, 
 	double coef_a = std::abs(f_res->GetParameter(0));
 	double coef_b = 0.;
 	double coef_c = std::abs(f_res->GetParameter(1));
+	double coef_a_error = std::abs(f_res->GetParError(0));
+	double coef_b_error = 0.;
+	double coef_c_error = std::abs(f_res->GetParError(1));
 
 	c_fit->Modified();
 	c_fit->Update();
@@ -178,7 +199,10 @@ double fit_energy_res(double res_sig_1, double res_sig_2, TH1D* h_1, TH1D* h_2, 
 
 	if(i == 0){return coef_a;}
 	else if(i == 1){return coef_b;}
-	else{return coef_c;}
+	else if(i == 2){return coef_c;}
+	else if(i == 3){return coef_a_error;}
+	else if(i == 4){return coef_b_error;}
+	else{return coef_c_error;}
 }
 
 void DataAnalyser::Analyze(Config& config)
@@ -242,9 +266,11 @@ void DataAnalyser::Analyze(Config& config)
   else{
     std::ifstream f_mea_1(config.name_f_mea_1.c_str());
     std::ifstream f_mea_2(config.name_f_mea_2.c_str());
-    
+      
+    //! change to read line by line
     while(f_mea_1 >> x1 >> y1){
       // std::cout << x1 << " " << y1 << "\n";
+      //! if not #
       bin_input1.push_back(x1);
       content_input1.push_back(y1);
     }
@@ -348,7 +374,7 @@ void DataAnalyser::Analyze(Config& config)
   //! Option to use all the events in the file for the iterations
   int entries_mea_descent_used_1 = config.entries_mea_descent;
   int entries_mea_descent_used_2 = config.entries_mea_descent;  
-  if (config.entries_mea_descent < 0){
+  if (config.entries_mea_descent = 0){
     entries_mea_descent_used_1 = t_mea_1->GetEntries();
     entries_mea_descent_used_2 = t_mea_2->GetEntries();
     std::cerr << "All events are used for measurement file 1: " << entries_mea_descent_used_1 << "; and measurement file 2: " << entries_mea_descent_used_2 << "\n";
@@ -356,7 +382,7 @@ void DataAnalyser::Analyze(Config& config)
 
   int entries_sim_descent_used_1 = config.entries_sim_descent;
   int entries_sim_descent_used_2 = config.entries_sim_descent;  
-  if (config.entries_sim_descent < 0){
+  if (config.entries_sim_descent = 0){
     entries_sim_descent_used_1 = t_sim_1->GetEntries();
     entries_sim_descent_used_2 = t_sim_2->GetEntries();
     std::cerr << "All events are used for simulation file 1: " << entries_sim_descent_used_1 << "; and simulation file 2: " << entries_sim_descent_used_2 << "\n";
@@ -806,6 +832,21 @@ void DataAnalyser::Analyze(Config& config)
     }
   
     if(delta_chi2 > thresh_delta_chi2){
+      
+      final_energy_calibration_coef_a = a;
+      final_energy_calibration_coef_b = b;
+
+      final_energy_calibration_coef_a_error = fit_energy(ch1, ch2, c_fit, 2, config);
+      final_energy_calibration_coef_b_error = fit_energy(ch1, ch2, c_fit, 3, config);
+
+      final_energy_resolution_coef_a = a_res;
+      final_energy_resolution_coef_b = b_res;
+      final_energy_resolution_coef_c = c_res;
+
+      final_energy_resolution_coef_a_error = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 3, config);
+      final_energy_resolution_coef_b_error = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 4, config);
+      final_energy_resolution_coef_c_error = fit_energy_res(config.res_1, config.res_2, h_cal_1_filtered, h_cal_2_filtered, x_min_cal, x_max_cal, c_fit, 5, config);
+
       delete h_sim_1_res;
       delete h_cal_1;
       delete h_sim_1_res_up_ch1;
@@ -847,15 +888,25 @@ void DataAnalyser::Analyze(Config& config)
     iteration++;
   }
   
-  double final_energy_calibration_coef_a = fit_energy(ch1, ch2, c_fit, 0, config);
-  double final_energy_calibration_coef_b = fit_energy(ch1, ch2, c_fit, 1, config);
-
-  std::cout << "\nCoefficients are: a = " << final_energy_calibration_coef_a << "; b = " << final_energy_calibration_coef_b << "\n";
+  std::cout << "\nCalibration coefficients are: a = " << final_energy_calibration_coef_a << "+-" << final_energy_calibration_coef_a_error << 
+  "; b = " << final_energy_calibration_coef_b << "+-" << final_energy_calibration_coef_b_error << "\n";
+  std::cout << "\nResolution coefficients are: a = " << final_energy_resolution_coef_a << "+-" << final_energy_resolution_coef_a_error <<
+  "; b = " << final_energy_resolution_coef_b << "+-" << final_energy_resolution_coef_b_error <<
+  "; c = " << final_energy_resolution_coef_c << "+-" << final_energy_resolution_coef_c_error << "\n";
 
   std::ofstream fileSave("../coefficients.txt");
   fileSave << "The function used to perform energy calibration is a linear equation E = a*Ch + b\n";
   fileSave << "a = " << final_energy_calibration_coef_a << "\n";
   fileSave << "b = " << final_energy_calibration_coef_b << "\n";
+  fileSave << "a_error = " << final_energy_calibration_coef_a_error << "\n";
+  fileSave << "b_error = " << final_energy_calibration_coef_b_error << "\n";
+  fileSave << "The function used for the energy resolution curve is E = a*Ch + b\n";
+  fileSave << "a = " << final_energy_resolution_coef_a << "\n";
+  fileSave << "b = " << final_energy_resolution_coef_b << "\n";
+  fileSave << "c = " << final_energy_resolution_coef_c << "\n";
+  fileSave << "a_error = " << final_energy_resolution_coef_a_error << "\n";
+  fileSave << "b_error = " << final_energy_resolution_coef_b_error << "\n";
+  fileSave << "c_error = " << final_energy_resolution_coef_c_error << "\n";
 
   fileSave.close();
 }

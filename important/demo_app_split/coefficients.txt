@@ -1,3 +1,12 @@
 The function used to perform energy calibration is a linear equation E = a*Ch + b
-a = 0.00234538
-b = -0.18557
+a = 0.002336
+b = -0.178248
+a_error = 0.00498057
+b_error = 1.87175
+The function used for the energy resolution curve is E = a*Ch + b
+a = 0.0552472
+b = 0
+c = 0.0209245
+a_error = 0.331337
+b_error = 0
+c_error = 0.311095
