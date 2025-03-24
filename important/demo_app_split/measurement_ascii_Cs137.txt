@@ -1,3 +1,5 @@
+# The example ASCII files represent the accquired energy spectra from a measurement.
+# The first columnn represents the bin corresponds to amplitude or channel, and the second column represents the height of the bin.
 100 2
 101 6
 102 6

@@ -266,20 +266,41 @@ void DataAnalyser::Analyze(Config& config)
   else{
     std::ifstream f_mea_1(config.name_f_mea_1.c_str());
     std::ifstream f_mea_2(config.name_f_mea_2.c_str());
-      
-    //! change to read line by line
-    while(f_mea_1 >> x1 >> y1){
-      // std::cout << x1 << " " << y1 << "\n";
-      //! if not #
-      bin_input1.push_back(x1);
-      content_input1.push_back(y1);
+    
+    std::string line;
+    while (std::getline(f_mea_1, line)) {
+      if (!line.empty() && line[0] != '#') { // Ignore empty lines and comments
+          std::istringstream iss(line);
+          if (iss >> x1 >> y1) {  // Ensure valid data extraction
+              bin_input1.push_back(x1);
+              content_input1.push_back(y1);
+          }
+      }
+    }
+    
+    while (std::getline(f_mea_2, line)) {
+      if (!line.empty() && line[0] != '#') { // Ignore empty lines and comments
+          std::istringstream iss(line);
+          if (iss >> x2 >> y2) {  // Ensure valid data extraction
+              bin_input2.push_back(x2);
+              content_input2.push_back(y2);
+          }
+      }
     }
 
-    while(f_mea_2 >> x2 >> y2){
-      // std::cout << x2 << " " << y2 << "\n";
-      bin_input2.push_back(x2);
-      content_input2.push_back(y2);
-    }
+  //   //! change to read line by line
+  //   while(f_mea_1 >> x1 >> y1){
+  //     // std::cout << x1 << " " << y1 << "\n";
+  //     //! if not #
+  //     bin_input1.push_back(x1);
+  //     content_input1.push_back(y1);
+  //   }
+
+    // while(f_mea_2 >> x2 >> y2){
+    //   // std::cout << x2 << " " << y2 << "\n";
+    //   bin_input2.push_back(x2);
+    //   content_input2.push_back(y2);
+    // }
   
     // std::cout << "bin_input.size() = " << bin_input.size() << "\n";
     // std::cout << "bin_input[0] = " << bin_input[0] << "\n";
@@ -706,7 +727,15 @@ void DataAnalyser::Analyze(Config& config)
     h_sim_1_res_filtered->GetXaxis()->UnZoom();
     h_cal_1_filtered->SetLineColor(kRed);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_filtered->Scale(config.scale_sim_1, "noSW2");
+
+    double integral_mea_1 = h_cal_1_filtered->Integral(h_cal_1_filtered->FindBin(config.x_min_descent_1), h_cal_1_filtered->FindBin(config.x_max_descent_1));
+    double integral_sim_1 = h_sim_1_res_filtered->Integral(h_cal_1_filtered->FindBin(config.x_min_descent_1), h_cal_1_filtered->FindBin(config.x_max_descent_1));
+    if(integral_mea_1/integral_sim_1 < 1.){
+      h_cal_1_filtered->Scale(integral_sim_1/integral_mea_1, "noSW2");
+    }
+    else{
+      h_sim_1_res_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
+    }
     h_sim_1_res_filtered->Draw("same");
   
     TLegend *legend = new TLegend(0.4, 0.55, 0.8, 0.85);
@@ -742,7 +771,17 @@ void DataAnalyser::Analyze(Config& config)
     h_sim_2_res_filtered->GetXaxis()->UnZoom();
     h_cal_2_filtered->SetLineColor(kRed);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_filtered->Scale(config.scale_sim_2, "noSW2");
+
+    double integral_mea_2 = h_cal_2_filtered->Integral(h_cal_2_filtered->FindBin(config.x_min_descent_2), h_cal_2_filtered->FindBin(config.x_max_descent_2));
+    double integral_sim_2 = h_sim_2_res_filtered->Integral(h_cal_2_filtered->FindBin(config.x_min_descent_2), h_cal_2_filtered->FindBin(config.x_max_descent_2));
+
+    if(integral_mea_1/integral_sim_1 < 1.){
+      h_cal_2_filtered->Scale(integral_sim_2/integral_mea_2, "noSW2");
+    }
+    else{
+      h_sim_2_res_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
+    }
+    
     h_sim_2_res_filtered->Draw("same");
   
     TLegend *legend1 = new TLegend(0.4, 0.55, 0.8, 0.85);
@@ -762,7 +801,7 @@ void DataAnalyser::Analyze(Config& config)
     c_derivative->cd(1);    
     h_cal_1_up_ch1_filtered->SetLineColor(kRed);
     h_cal_1_up_ch1_filtered->Draw();
-    h_sim_1_res_up_ch1_filtered->Scale(config.scale_sim_1, "noSW2");
+    h_sim_1_res_up_ch1_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
     h_sim_1_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(1)->Modified();
     c_derivative->cd(1)->Update();
@@ -770,21 +809,21 @@ void DataAnalyser::Analyze(Config& config)
     c_derivative->cd(2);    
     h_cal_1_up_ch2_filtered->SetLineColor(kRed);
     h_cal_1_up_ch2_filtered->Draw();
-    h_sim_1_res_up_ch2_filtered->Scale(config.scale_sim_1, "noSW2");
+    h_sim_1_res_up_ch2_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
     h_sim_1_res_up_ch2_filtered->Draw("same");
     c_derivative->cd(2)->Modified();
     c_derivative->cd(2)->Update();
   
     c_derivative->cd(3);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig1_filtered->Scale(config.scale_sim_1, "noSW2");
+    h_sim_1_res_up_sig1_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
     h_sim_1_res_up_sig1_filtered->Draw("same");
     c_derivative->cd(3)->Modified();
     c_derivative->cd(3)->Update();
   
     c_derivative->cd(4);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig2_filtered->Scale(config.scale_sim_1, "noSW2");
+    h_sim_1_res_up_sig2_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
     h_sim_1_res_up_sig2_filtered->Draw("same");
     c_derivative->cd(4)->Modified();
     c_derivative->cd(4)->Update();
@@ -792,7 +831,7 @@ void DataAnalyser::Analyze(Config& config)
     c_derivative->cd(5);    
     h_cal_2_up_ch1_filtered->SetLineColor(kRed);
     h_cal_2_up_ch1_filtered->Draw();
-    h_sim_2_res_up_ch1_filtered->Scale(config.scale_sim_2, "noSW2");
+    h_sim_2_res_up_ch1_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
     h_sim_2_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(5)->Modified();
     c_derivative->cd(5)->Update();
@@ -800,21 +839,21 @@ void DataAnalyser::Analyze(Config& config)
     c_derivative->cd(6);    
     h_cal_2_up_ch2_filtered->SetLineColor(kRed);
     h_cal_2_up_ch2_filtered->Draw();
-    h_sim_2_res_up_ch2_filtered->Scale(config.scale_sim_2, "noSW2");
+    h_sim_2_res_up_ch2_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
     h_sim_2_res_up_ch2_filtered->Draw("same");
     c_derivative->cd(6)->Modified();
     c_derivative->cd(6)->Update();
   
     c_derivative->cd(7);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_up_sig1_filtered->Scale(config.scale_sim_2, "noSW2");
+    h_sim_2_res_up_sig1_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
     h_sim_2_res_up_sig1_filtered->Draw("same");
     c_derivative->cd(7)->Modified();
     c_derivative->cd(7)->Update();
   
     c_derivative->cd(8);
     h_cal_2_filtered->Draw();
-    h_sim_2_res_up_sig2_filtered->Scale(config.scale_sim_2, "noSW2");
+    h_sim_2_res_up_sig2_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
     h_sim_2_res_up_sig2_filtered->Draw("same");
     c_derivative->cd(8)->Modified();
     c_derivative->cd(8)->Update();
@@ -900,13 +939,13 @@ void DataAnalyser::Analyze(Config& config)
   fileSave << "b = " << final_energy_calibration_coef_b << "\n";
   fileSave << "a_error = " << final_energy_calibration_coef_a_error << "\n";
   fileSave << "b_error = " << final_energy_calibration_coef_b_error << "\n";
-  fileSave << "The function used for the energy resolution curve is E = a*Ch + b\n";
+  fileSave << "The function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x c^2/x^2)\n";
   fileSave << "a = " << final_energy_resolution_coef_a << "\n";
   fileSave << "b = " << final_energy_resolution_coef_b << "\n";
   fileSave << "c = " << final_energy_resolution_coef_c << "\n";
   fileSave << "a_error = " << final_energy_resolution_coef_a_error << "\n";
   fileSave << "b_error = " << final_energy_resolution_coef_b_error << "\n";
-  fileSave << "c_error = " << final_energy_resolution_coef_c_error << "\n";
+  fileSave << "c_error = " << final_energy_resolution_coef_c_error;
 
   fileSave.close();
 }

@@ -43,10 +43,6 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
     {"step_channel_2", required_argument, 0, opt_step_channel_2},
     {"step_res_1", required_argument, 0, opt_step_res_1},
     {"step_res_2", required_argument, 0, opt_step_res_2},
-    {"scale_sim_1", required_argument, 0, opt_scale_sim_1},
-    {"scale_sim_2", required_argument, 0, opt_scale_sim_2},
-    {"scale_mea_1", required_argument, 0, opt_scale_mea_1},
-    {"scale_mea_2", required_argument, 0, opt_scale_mea_2},
     {nullptr, 0, nullptr, 0}
   };
 
@@ -263,22 +259,6 @@ int ArgumentParser::Parse(int argc, char** argv, Config& config){
       WriteOutput(optarg, config.step_res_2, config.step_res_2, "Step of energy resolution 2 for calculating gradient");
       break;
       
-    case opt_scale_sim_1:
-      WriteOutput(optarg, config.scale_sim_1, config.scale_sim_1, "Scaling factor for simulation histogram 1");
-      break;
-      
-    case opt_scale_sim_2:
-      WriteOutput(optarg, config.scale_sim_2, config.scale_sim_2, "Scaling factor for simulation histogram 2");
-      break;
-      
-    case opt_scale_mea_1:
-      WriteOutput(optarg, config.scale_mea_1, config.scale_mea_1, "Scaling factor for measurement histogram 1");
-      break;
-      
-    case opt_scale_mea_2:
-      WriteOutput(optarg, config.scale_mea_2, config.scale_mea_2, "Scaling factor for measurement histogram 2");
-      break;
-
     case '?': // Handle unknown options
       return -1;
     }

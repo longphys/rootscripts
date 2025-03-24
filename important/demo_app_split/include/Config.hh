@@ -79,10 +79,5 @@ struct Config{
   double step_res_1;
   double step_res_2;
 
-  // Default scaling factor of histograms
-  double scale_sim_1 = 1.;
-  double scale_sim_2 = 1.;
-  double scale_mea_1 = 1.;
-  double scale_mea_2 = 1.;
 };
 #endif

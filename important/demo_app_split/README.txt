@@ -69,7 +69,3 @@
   --step_channel_2 1 <double> - Step size of the Compton edge position of the second file.
   --step_res_1 0.05 <double> - Step size of the resolution of the Compton edge position of the first file.
   --step_res_2 0.05 <double> - Step size of the resolution of the Compton edge position of the second file.
-  --scale_sim_1 8.3 <double> - Scaling value of the first simulated histogram.
-  --scale_sim_2 4.2 <double> - Scaling value of the second simulated histogram.
-  --scale_mea_1 1. <double> - Scaling value of the first measured histogram.
-  --scale_mea_2 1. <double> - Scaling value of the second measured histogram.
