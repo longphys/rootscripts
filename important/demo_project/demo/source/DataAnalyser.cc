@@ -939,13 +939,16 @@ void DataAnalyser::Analyze(Config& config)
   fileSave << "b = " << final_energy_calibration_coef_b << "\n";
   fileSave << "a_error = " << final_energy_calibration_coef_a_error << "\n";
   fileSave << "b_error = " << final_energy_calibration_coef_b_error << "\n";
-  fileSave << "The function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x c^2/x^2)\n";
+  fileSave << "\nThe function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x + c^2/x^2)\n";
   fileSave << "a = " << final_energy_resolution_coef_a << "\n";
   fileSave << "b = " << final_energy_resolution_coef_b << "\n";
   fileSave << "c = " << final_energy_resolution_coef_c << "\n";
   fileSave << "a_error = " << final_energy_resolution_coef_a_error << "\n";
   fileSave << "b_error = " << final_energy_resolution_coef_b_error << "\n";
-  fileSave << "c_error = " << final_energy_resolution_coef_c_error;
+  fileSave << "c_error = " << final_energy_resolution_coef_c_error << "\n";
+  //! Include chi-square distance output (only within the descent range)
+  fileSave << "\nChi-square distance for 1st histogram from " << config.x_min_descent_1 << " to " << config.x_max_descent_1 << " (MeV) = " << chi2_1 << "\n";
+  fileSave << "Chi-square distance for 2nd histogram from " << config.x_min_descent_2 << " to " << config.x_max_descent_2 << " (MeV) = " << chi2_2 << "\n";
 
   fileSave.close();
 }

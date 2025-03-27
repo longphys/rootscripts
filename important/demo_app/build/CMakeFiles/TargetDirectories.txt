@@ -1,3 +1,0 @@
-/home/long/data/rootscripts/important/demo_app/build/CMakeFiles/rebuild_cache.dir
-/home/long/data/rootscripts/important/demo_app/build/CMakeFiles/edit_cache.dir
-/home/long/data/rootscripts/important/demo_app/build/CMakeFiles/demo.dir
