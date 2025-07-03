@@ -1,0 +1,3 @@
+/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/calib.dir
+/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/edit_cache.dir
+/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/rebuild_cache.dir
