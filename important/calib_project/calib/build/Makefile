@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib"
+CMAKE_SOURCE_DIR = /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build"
+CMAKE_BINARY_DIR = /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build//CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

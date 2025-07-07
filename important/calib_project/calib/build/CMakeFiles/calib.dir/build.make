@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib"
+CMAKE_SOURCE_DIR = /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build"
+CMAKE_BINARY_DIR = /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/calib.dir/depend.make
@@ -70,60 +70,60 @@ include CMakeFiles/calib.dir/progress.make
 include CMakeFiles/calib.dir/flags.make
 
 CMakeFiles/calib.dir/calib.cc.o: CMakeFiles/calib.dir/flags.make
-CMakeFiles/calib.dir/calib.cc.o: /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/calib.cc
+CMakeFiles/calib.dir/calib.cc.o: /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/calib.cc
 CMakeFiles/calib.dir/calib.cc.o: CMakeFiles/calib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/calib.dir/calib.cc.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/calib.cc.o -MF CMakeFiles/calib.dir/calib.cc.o.d -o CMakeFiles/calib.dir/calib.cc.o -c "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/calib.cc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/calib.dir/calib.cc.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/calib.cc.o -MF CMakeFiles/calib.dir/calib.cc.o.d -o CMakeFiles/calib.dir/calib.cc.o -c /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/calib.cc
 
 CMakeFiles/calib.dir/calib.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/calib.dir/calib.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/calib.cc" > CMakeFiles/calib.dir/calib.cc.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/calib.cc > CMakeFiles/calib.dir/calib.cc.i
 
 CMakeFiles/calib.dir/calib.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/calib.dir/calib.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/calib.cc" -o CMakeFiles/calib.dir/calib.cc.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/calib.cc -o CMakeFiles/calib.dir/calib.cc.s
 
 CMakeFiles/calib.dir/source/ArgumentParser.cc.o: CMakeFiles/calib.dir/flags.make
-CMakeFiles/calib.dir/source/ArgumentParser.cc.o: /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc
+CMakeFiles/calib.dir/source/ArgumentParser.cc.o: /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc
 CMakeFiles/calib.dir/source/ArgumentParser.cc.o: CMakeFiles/calib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/calib.dir/source/ArgumentParser.cc.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/ArgumentParser.cc.o -MF CMakeFiles/calib.dir/source/ArgumentParser.cc.o.d -o CMakeFiles/calib.dir/source/ArgumentParser.cc.o -c "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/calib.dir/source/ArgumentParser.cc.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/ArgumentParser.cc.o -MF CMakeFiles/calib.dir/source/ArgumentParser.cc.o.d -o CMakeFiles/calib.dir/source/ArgumentParser.cc.o -c /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc
 
 CMakeFiles/calib.dir/source/ArgumentParser.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/calib.dir/source/ArgumentParser.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc" > CMakeFiles/calib.dir/source/ArgumentParser.cc.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc > CMakeFiles/calib.dir/source/ArgumentParser.cc.i
 
 CMakeFiles/calib.dir/source/ArgumentParser.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/calib.dir/source/ArgumentParser.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc" -o CMakeFiles/calib.dir/source/ArgumentParser.cc.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/ArgumentParser.cc -o CMakeFiles/calib.dir/source/ArgumentParser.cc.s
 
 CMakeFiles/calib.dir/source/DataAnalyser.cc.o: CMakeFiles/calib.dir/flags.make
-CMakeFiles/calib.dir/source/DataAnalyser.cc.o: /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc
+CMakeFiles/calib.dir/source/DataAnalyser.cc.o: /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc
 CMakeFiles/calib.dir/source/DataAnalyser.cc.o: CMakeFiles/calib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/calib.dir/source/DataAnalyser.cc.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/DataAnalyser.cc.o -MF CMakeFiles/calib.dir/source/DataAnalyser.cc.o.d -o CMakeFiles/calib.dir/source/DataAnalyser.cc.o -c "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/calib.dir/source/DataAnalyser.cc.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/DataAnalyser.cc.o -MF CMakeFiles/calib.dir/source/DataAnalyser.cc.o.d -o CMakeFiles/calib.dir/source/DataAnalyser.cc.o -c /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc
 
 CMakeFiles/calib.dir/source/DataAnalyser.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/calib.dir/source/DataAnalyser.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc" > CMakeFiles/calib.dir/source/DataAnalyser.cc.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc > CMakeFiles/calib.dir/source/DataAnalyser.cc.i
 
 CMakeFiles/calib.dir/source/DataAnalyser.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/calib.dir/source/DataAnalyser.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc" -o CMakeFiles/calib.dir/source/DataAnalyser.cc.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc -o CMakeFiles/calib.dir/source/DataAnalyser.cc.s
 
 CMakeFiles/calib.dir/source/MacroReader.cc.o: CMakeFiles/calib.dir/flags.make
-CMakeFiles/calib.dir/source/MacroReader.cc.o: /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc
+CMakeFiles/calib.dir/source/MacroReader.cc.o: /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc
 CMakeFiles/calib.dir/source/MacroReader.cc.o: CMakeFiles/calib.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/calib.dir/source/MacroReader.cc.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/MacroReader.cc.o -MF CMakeFiles/calib.dir/source/MacroReader.cc.o.d -o CMakeFiles/calib.dir/source/MacroReader.cc.o -c "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/calib.dir/source/MacroReader.cc.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/calib.dir/source/MacroReader.cc.o -MF CMakeFiles/calib.dir/source/MacroReader.cc.o.d -o CMakeFiles/calib.dir/source/MacroReader.cc.o -c /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc
 
 CMakeFiles/calib.dir/source/MacroReader.cc.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/calib.dir/source/MacroReader.cc.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc" > CMakeFiles/calib.dir/source/MacroReader.cc.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc > CMakeFiles/calib.dir/source/MacroReader.cc.i
 
 CMakeFiles/calib.dir/source/MacroReader.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/calib.dir/source/MacroReader.cc.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc" -o CMakeFiles/calib.dir/source/MacroReader.cc.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc -o CMakeFiles/calib.dir/source/MacroReader.cc.s
 
 # Object files for target calib
 calib_OBJECTS = \
@@ -160,7 +160,7 @@ calib: /home/long/software/root/root-install/lib/libThread.so
 calib: /home/long/software/root/root-install/lib/libMultiProc.so
 calib: /home/long/software/root/root-install/lib/libROOTVecOps.so
 calib: CMakeFiles/calib.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable calib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable calib"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/calib.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -172,6 +172,6 @@ CMakeFiles/calib.dir/clean:
 .PHONY : CMakeFiles/calib.dir/clean
 
 CMakeFiles/calib.dir/depend:
-	cd "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build" "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/calib.dir/DependInfo.cmake" "--color=$(COLOR)"
+	cd /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/calib.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/calib.dir/depend
 

@@ -1,4 +1,4 @@
-# Install script for directory: /media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib
+# Install script for directory: /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

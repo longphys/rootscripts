@@ -1,7 +1,7 @@
 CMakeFiles/calib.dir/source/DataAnalyser.cc.o: \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/DataAnalyser.cc \
  /usr/include/stdc-predef.h \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/DataAnalyser.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/DataAnalyser.hh \
  /usr/include/c++/13/iostream /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \
@@ -375,7 +375,7 @@ CMakeFiles/calib.dir/source/DataAnalyser.cc.o: \
  /home/long/software/root/root-install/include/TPave.h \
  /home/long/software/root/root-install/include/TBox.h \
  /home/long/software/root/root-install/include/TAttText.h \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/Config.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/Config.hh \
  /usr/include/getopt.h /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_ext.h

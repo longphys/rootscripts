@@ -1,7 +1,7 @@
 CMakeFiles/calib.dir/source/MacroReader.cc.o: \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/source/MacroReader.cc \
  /usr/include/stdc-predef.h \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/MacroReader.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/MacroReader.hh \
  /usr/include/c++/13/iostream /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h \

@@ -1,5 +1,5 @@
 CMakeFiles/calib.dir/calib.cc.o: \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/calib.cc \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/calib.cc \
  /usr/include/stdc-predef.h \
  /home/long/software/root/root-install/include/TFile.h \
  /usr/include/c++/13/atomic /usr/include/c++/13/bits/atomic_base.h \
@@ -371,16 +371,16 @@ CMakeFiles/calib.dir/calib.cc.o: \
  /home/long/software/root/root-install/include/TBox.h \
  /home/long/software/root/root-install/include/TAttText.h \
  /home/long/software/root/root-install/include/TStopwatch.h \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/Config.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/Config.hh \
  /usr/include/getopt.h /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_ext.h \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/MacroReader.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/MacroReader.hh \
  /usr/include/c++/13/fstream /usr/include/c++/13/bits/codecvt.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h \
  /usr/include/c++/13/bits/fstream.tcc /usr/include/c++/13/sstream \
  /usr/include/c++/13/bits/sstream.tcc \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/DataAnalyser.hh \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
- /media/long/UBUNTU\ DATA/data/rootscripts/important/calib_project/calib/include/Config.hh
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/DataAnalyser.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/ArgumentParser.hh \
+ /media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include/Config.hh

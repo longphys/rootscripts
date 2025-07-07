@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/long/software/root/root-install/include -I"/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/include"
+CXX_INCLUDES = -I/home/long/software/root/root-install/include -I/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/include
 
 CXX_FLAGS =  -g -g -std=gnu++17
 

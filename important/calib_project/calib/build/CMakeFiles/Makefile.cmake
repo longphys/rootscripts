@@ -13,7 +13,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/home/long/software/root/root-install/cmake/ROOTConfig.cmake"
   "/home/long/software/root/root-install/cmake/RootMacros.cmake"
   "/home/long/software/root/root-install/cmake/modules/FindVdt.cmake"
-  "/media/long/UBUNTU DATA/data/rootscripts/important/calib_project/calib/CMakeLists.txt"
+  "/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
