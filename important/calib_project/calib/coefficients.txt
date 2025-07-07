@@ -1,16 +1,16 @@
 The function used to perform energy calibration is a linear equation E = a*Ch + b
-a = 0.002336
-b = -0.178248
-a_error = 0.00498057
-b_error = 1.87175
+a = 0.00237398
+b = -0.186528
+a_error = 0.00504131
+b_error = 1.88317
 
 The function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x + c^2/x^2)
-a = 0.0552472
+a = 0.0533092
 b = 0
-c = 0.0209245
-a_error = 0.331337
+c = 0.0233664
+a_error = 0.339574
 b_error = 0
-c_error = 0.311095
+c_error = 0.290908
 
-Chi-square distance for 1st histogram from 0.35 to 0.6 (MeV) = 2.21487
-Chi-square distance for 2nd histogram from 0.8 to 1.2 (MeV) = 1.18522
+Chi-square distance for 1st histogram from 0.35 to 0.6 (MeV) = 2.51398
+Chi-square distance for 2nd histogram from 0.8 to 1.2 (MeV) = 1.19095

@@ -818,27 +818,25 @@ void DataAnalyser::Analyze(Config& config)
     c_derivative->cd(1)->Update();
   
     c_derivative->cd(2);    
-    h_cal_1_up_ch2_filtered->SetLineColor(kRed);
-    h_cal_1_up_ch2_filtered->Draw();
-    h_sim_1_res_up_ch2_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
-    h_sim_1_res_up_ch2_filtered->Draw("same");
+    h_cal_2_up_ch1_filtered->SetLineColor(kRed);
+    h_cal_2_up_ch1_filtered->Draw();
+    h_sim_2_res_up_ch1_filtered->Scale(integral_mea_2/integral_sim_2, "noSW2");
+    h_sim_2_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(2)->Modified();
     c_derivative->cd(2)->Update();
   
     c_derivative->cd(3);
     h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig1_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
-    h_sim_1_res_up_sig1_filtered->Draw("same");
+    h_sim_1_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(3)->Modified();
     c_derivative->cd(3)->Update();
   
     c_derivative->cd(4);
-    h_cal_1_filtered->Draw();
-    h_sim_1_res_up_sig2_filtered->Scale(integral_mea_1/integral_sim_1, "noSW2");
-    h_sim_1_res_up_sig2_filtered->Draw("same");
+    h_cal_2_filtered->Draw();
+    h_sim_2_res_up_ch1_filtered->Draw("same");
     c_derivative->cd(4)->Modified();
     c_derivative->cd(4)->Update();
-  
+  /*
     c_derivative->cd(5);    
     h_cal_2_up_ch1_filtered->SetLineColor(kRed);
     h_cal_2_up_ch1_filtered->Draw();
@@ -868,7 +866,7 @@ void DataAnalyser::Analyze(Config& config)
     h_sim_2_res_up_sig2_filtered->Draw("same");
     c_derivative->cd(8)->Modified();
     c_derivative->cd(8)->Update();
-  
+  */
     if(iteration > 1){
       if (chi2_1 < thresh_delta_chi2_each){
       config.learning_rate_channel_1 = 0.3*config.learning_rate_channel_1;
@@ -937,6 +935,10 @@ void DataAnalyser::Analyze(Config& config)
     else{}
     iteration++;
   }
+  
+  std::cout << "ch1 = " << ch1 << "; ch2 = " << ch2 
+  << "\nSig1 = " << config.res_1 << "; Sig2 = " << config.res_2 << "\n";
+  
   std::cout << "\nEnergy calibration function: E = a*Ch + b\n";
   std::cout << "Coefficients:\na = " << final_energy_calibration_coef_a << " +/- " << final_energy_calibration_coef_a_error << 
   ";\nb = " << final_energy_calibration_coef_b << " +/- " << final_energy_calibration_coef_b_error << "\n";

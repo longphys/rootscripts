@@ -32,8 +32,8 @@
 --thresh_fft_ini_2 50
 --rate_fft_descent_1 0.5
 --rate_fft_descent_2 0.5
---thresh_fft_descent_sim 1000
---thresh_fft_descent_mea 1000
+--thresh_fft_descent_sim 1000.
+--thresh_fft_descent_mea 1000.
 --learning_rate_channel_1 1.
 --learning_rate_channel_2 1.
 --learning_rate_res_1 0.01
