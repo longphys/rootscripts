@@ -1,16 +1,21 @@
+First Compton Edge = 282
+Second Compton Edge = 529
+First Compton Edge Resolution = 7.12097
+Second Compton Edge Resolution = 5.55874
+
 The function used to perform energy calibration is a linear equation E = a*Ch + b
-a = 0.00237398
-b = -0.186528
-a_error = 0.00504131
-b_error = 1.88317
+a = 0.00235484
+b = -0.185887
+a_error = 0.0050209
+b_error = 1.8873
 
 The function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x + c^2/x^2)
-a = 0.0533092
+a = 0.051183
 b = 0
-c = 0.0233664
-a_error = 0.339574
+c = 0.0228349
+a_error = 0.334397
 b_error = 0
-c_error = 0.290908
+c_error = 0.284615
 
-Chi-square distance for 1st histogram from 0.35 to 0.6 (MeV) = 2.51398
-Chi-square distance for 2nd histogram from 0.8 to 1.2 (MeV) = 1.19095
+Chi-square distance for 1st histogram from 0.35 to 0.55 (MeV) = 2.04381
+Chi-square distance for 2nd histogram from 0.8 to 1.2 (MeV) = 1.26222

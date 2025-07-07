@@ -936,8 +936,8 @@ void DataAnalyser::Analyze(Config& config)
     iteration++;
   }
   
-  std::cout << "ch1 = " << ch1 << "; ch2 = " << ch2 
-  << "\nSig1 = " << config.res_1 << "; Sig2 = " << config.res_2 << "\n";
+  std::cout << "\nFirst Compton Edge = " << ch1 << "; Second Compton Edge = " << ch2 
+  << "\nFirst Compton Edge Resolution = " << config.res_1 << "; Second Compton Edge Resolution = " << config.res_2 << "\n";
   
   std::cout << "\nEnergy calibration function: E = a*Ch + b\n";
   std::cout << "Coefficients:\na = " << final_energy_calibration_coef_a << " +/- " << final_energy_calibration_coef_a_error << 
@@ -951,11 +951,18 @@ void DataAnalyser::Analyze(Config& config)
 
   std::string file_to_be_saved = "../coefficients.txt";
   std::ofstream fileSave(file_to_be_saved);
-  fileSave << "The function used to perform energy calibration is a linear equation E = a*Ch + b\n";
+  
+  fileSave << "First Compton Edge = " << ch1 << "\n"; 
+  fileSave << "Second Compton Edge = " << ch2 << "\n"; 
+  fileSave << "First Compton Edge Resolution = " << config.res_1 << "\n";
+  fileSave << "Second Compton Edge Resolution = " << config.res_2 << "\n";
+  
+  fileSave << "\nThe function used to perform energy calibration is a linear equation E = a*Ch + b\n";
   fileSave << "a = " << final_energy_calibration_coef_a << "\n";
   fileSave << "b = " << final_energy_calibration_coef_b << "\n";
   fileSave << "a_error = " << final_energy_calibration_coef_a_error << "\n";
   fileSave << "b_error = " << final_energy_calibration_coef_b_error << "\n";
+  
   fileSave << "\nThe function used for the energy resolution curve is sigma_E = E*sqrt(a^2 + b^2/x + c^2/x^2)\n";
   fileSave << "a = " << final_energy_resolution_coef_a << "\n";
   fileSave << "b = " << final_energy_resolution_coef_b << "\n";
@@ -968,5 +975,5 @@ void DataAnalyser::Analyze(Config& config)
   fileSave << "Chi-square distance for 2nd histogram from " << config.x_min_descent_2 << " to " << config.x_max_descent_2 << " (MeV) = " << chi2_2 << "\n";
 
   fileSave.close();
-  std::cout << "\nOutput file is saved to" << file_to_be_saved;
+  std::cout << "\nOutput file is saved to: " << file_to_be_saved;
 }

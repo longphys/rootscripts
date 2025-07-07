@@ -23,7 +23,7 @@
 --x_min_fft_2 300
 --x_max_fft_2 1000
 --x_min_descent_1 0.35
---x_max_descent_1 0.6
+--x_max_descent_1 0.55
 --x_min_descent_2 0.8
 --x_max_descent_2 1.2
 --rate_fft_ini_1 0.1
