@@ -37,126 +37,6 @@ double deltaSigNa22[2] = {5.1, 5.5};
 //! Channels
 int channel[2] = {0, 1};
 
-//! Derivative
-const char* TH1namechar;
-const char* TH1titlechar;
-int threshold(TH1D* hChannel, std::string TH1name, std::string TH1title, int bin, double xmin, double xmax)
-{
-  TH1D* Diff = new TH1D();
-  TH1namechar = TH1name.c_str();
-  TH1titlechar = TH1title.c_str();
-  double binLength = (xmax-xmin)/bin;
-  double zeroBinValue = 100000.;
-  int zeroBin;
-  double maxBinValue = 0.;
-  int maxBin;
-
-  TH1D* hDiff = new TH1D(TH1namechar, TH1titlechar, bin, xmin, xmax);
-  for(int i = 3; i <= bin - 2; i++)
-  {
-    double newBinContent = 1000000*(-hChannel->GetBinContent(i+2) 
-    + 8*hChannel->GetBinContent(i+1) 
-    - 8*hChannel->GetBinContent(i-1) 
-    + hChannel->GetBinContent(i-2))/12*binLength;
-    hDiff->SetBinContent(i, newBinContent);
-    if (abs(newBinContent) < zeroBinValue && abs(newBinContent) > 0.){
-      zeroBin = i;
-      zeroBinValue = abs(newBinContent);
-      std::cout << "binContent["<< i << "] = " << newBinContent << "\n";
-    }
-  }
-
-  delete Diff;
-  return zeroBin;
-}
-
-//! FFT
-TH1D* fft(TH1D* hChannel, double para_k, double para_c, std::string TH1name, std::string TH1title, int bin, double xmin, double xmax)
-{
-  int binEven = 2*bin;
-  TH1namechar = TH1name.c_str();
-  TH1titlechar = TH1title.c_str();
-
-  TH1D* hFiltered = new TH1D(TH1namechar, TH1titlechar, bin, xmin, xmax);
-  TH1D* hEvenChannel = new TH1D("hEvenChannel", "Transformed to even function", binEven, -(xmax - xmin), xmax - xmin);
-
-  for(int i = 1; i <= binEven/2; i++)
-  {
-    hEvenChannel->SetBinContent(i, hChannel->GetBinContent(i));
-    hEvenChannel->SetBinContent(binEven - i, hChannel->GetBinContent(i));
-  }
-  hEvenChannel->SetBinContent(binExp, hEvenChannel->GetBinContent(binExp + 1));
-
-  TF1* fLogis = new TF1("fLogis", "1./(1.+exp([0]*(x-[1])))", 0, binEven);
-  fLogis->SetParameter(0, para_k);
-  fLogis->SetParameter(1, para_c);
-  fLogis->SetNpx(10000);
-
-  //! Magnitude
-  TH1 *hm = nullptr;
-  TVirtualFFT::SetTransform(nullptr);
-  hm = hEvenChannel->FFT(hm, "MAG");
-  
-  TH1D* newhm = new TH1D("newhm", "newhm", binEven, -(xmax - xmin), xmax - xmin);
-  for(int i = 1; i <= binEven; i++)
-  {
-    newhm->SetBinContent(i, hm->GetBinContent(i)/binEven);
-  }
-
-  TH1D* hLogis = new TH1D("hLogis", "Logis", binEven, 0, binEven);
-  for(int i = 1; i <= binEven/2; i++)
-  {
-    hLogis->SetBinContent(i, fLogis->Eval(i));
-    hLogis->SetBinContent(binEven-i, fLogis->Eval(i));
-  }
-
-  hLogis->SetLineColor(kRed);
-  hLogis->Draw("same");
-
-  //! Apply threshold
-  TVirtualFFT *fft = TVirtualFFT::GetCurrentTransform();
-  Double_t *re_full = new Double_t[binEven];
-  Double_t *im_full = new Double_t[binEven];
- 
-  fft->GetPointsComplex(re_full, im_full);
-
-  for(int i = 1; i <= binEven; i++)
-  {
-    re_full[i] = re_full[i]*hLogis->GetBinContent(i);
-    im_full[i] = im_full[i]*hLogis->GetBinContent(i);
-  }
-
-  TVirtualFFT *fft_back = TVirtualFFT::FFT(1, &binEven, "C2R M K");
-  fft_back->SetPointsComplex(re_full,im_full);
-  fft_back->Transform();
-  TH1 *hb = nullptr;
-  hb = TH1::TransformHisto(fft_back,hb,"RE");
-
-  TH1D* newhb = new TH1D("newhb", "newhb", binEven, -(xmax - xmin), xmax - xmin);
-  for(int i = 1; i <= binEven; i++)
-  {
-    newhb->SetBinContent(i, hb->GetBinContent(i)/binEven);
-  }
-
-  for(int i = 1; i <= bin; i++)
-  {
-    hFiltered->SetBinContent(i, newhb->GetBinContent(i));
-  }
-
-  delete hEvenChannel;
-  delete hm;
-  delete newhm;
-  delete fLogis;
-  delete hLogis;
-  delete[] re_full;
-  delete[] im_full;
-  delete fft_back;
-  delete hb;
-  delete newhb;
-
-  return hFiltered;
-}
-
 void readNeutron()
 {
   auto timer = new TStopwatch();
@@ -206,7 +86,7 @@ void readNeutron()
   tbackground->SetBranchAddress("EDep", &EDepBackground);
   
   Long64_t entries_exp = texp->GetEntries();
-  // entries_exp = 15460000; //! 10% of data
+  entries_exp = 15460000; //! 10% of data
   // entries_exp = 15460000*3; //!
   // entries_exp = 100000;
   // entries_exp = 5000000;
