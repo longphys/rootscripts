@@ -1,3 +1,0 @@
-/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/calib.dir
-/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/edit_cache.dir
-/media/long/UBUNTUDATA/data/rootscripts/important/calib_project/calib/build/CMakeFiles/rebuild_cache.dir
