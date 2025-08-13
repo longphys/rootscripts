@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "read0.C": "cpp",
+        "unpack0.C": "cpp",
+        "unpack1.C": "cpp",
+        "sstream": "cpp"
+    }
+}
