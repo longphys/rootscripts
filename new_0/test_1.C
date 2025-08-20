@@ -10,6 +10,7 @@
 #include "TRandom3.h"
 #include "TStopwatch.h"
 #include "TChain.h"
+#include "TBranchElement.h"
 #include "TDirectory.h"
 
 void test_1()
@@ -18,7 +19,7 @@ void test_1()
   timer->Start();
 
   //! Files and trees
-  TFile* file = new TFile("~/25e04/run12_0001.root", "read");
+  TFile* file = new TFile("~/data/25e04/run25_00.root", "read");
   if (!file || file->IsZombie()) {
         std::cerr << "Error: Cannot open file or file is corrupted.\n";
         return;
@@ -26,7 +27,7 @@ void test_1()
         
   TTree* tree =  (TTree*) file->Get("AnalysisxTree");
   if (!tree) {
-        std::cerr << "Error: TTree 'mytree' not found in the file.\n";
+        std::cerr << "Error: TTree 'AnalysisxTree' not found in the file.\n";
         file->Close();
         return;
   }
@@ -37,16 +38,15 @@ void test_1()
   chain->Add("~/25e04/run12_0001.root?#AnalysisxTree");
   */
   
-  TBranchElement* element = (TBranchElement*)tree->GetBranch("NeEvent.Lea[16]");
-	std::cout << "\nElement name: " << element->GetName() << "\n";
-	std::cout << "Type name: " << element->GetTypeName() << "\n";
+  TBranch* element = (TBranch*)tree->GetBranch("NeEvent.Lea[16]");
+  element->Print();
   
   
-  int n_de_right = 16;
-  int n_de_left = 32;
-  
-  int n_e_right = 16;
-  int n_e_left = 32;
+  constexpr int n_de_right = 16;
+  constexpr int n_de_left = 32;
+ 
+  constexpr int n_e_right = 16;
+  constexpr int n_e_left = 32;
   
   double thresh_map_right_min = 200.;
   double thresh_map_right_max = 7600.;
@@ -97,8 +97,8 @@ void test_1()
   // Entries
   Long64_t entries_all = tree->GetEntries();
   std::cout << "\nNumber of all entries: " << entries_all << "\n";
-  Long64_t entries_used = entries_all;
-  //Long64_t entries_used = 500000;
+  // Long64_t entries_used = entries_all;
+  Long64_t entries_used = 50000;
   std::cout << "\nNumber of entries used: " << entries_used << "\n";
   
   // Histograms: Silicon strips
