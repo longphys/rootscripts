@@ -44,19 +44,19 @@ void draw_csv() {
 
     TF1* f_csv = new TF1("gaussian", "gaus", 0, nbins);
     // h_csv->Fit("gaussian", "+", "", 1040, 1090);
-    h_csv->Fit("gaussian", "+", "", 1040, 1090);
+    h_csv->Fit("gaussian", "+", "", 870, 1010);
     double centroid_1 = f_csv->GetParameter(1);
     double width_1 = f_csv->GetParameter(2);
     // h_csv->Fit("gaussian", "+", "", 1270, 1320);
-    h_csv->Fit("gaussian", "+", "", 1270, 1320);
+    h_csv->Fit("gaussian", "+", "", 1170, 1250);
     double centroid_2 = f_csv->GetParameter(1);
     double width_2 = f_csv->GetParameter(2);
     // h_csv->Fit("gaussian", "+", "", 1415, 1485);
-    h_csv->Fit("gaussian", "+", "", 1415, 1485);
+    h_csv->Fit("gaussian", "+", "", 1320, 1425);
     double centroid_3 = f_csv->GetParameter(1);
     double width_3 = f_csv->GetParameter(2);
     // h_csv->Fit("gaussian", "+", "", 1945, 2000);
-    h_csv->Fit("gaussian", "+", "", 1945, 2000);
+    h_csv->Fit("gaussian", "+", "", 1870, 1970);
     double centroid_4 = f_csv->GetParameter(1);
     double width_4 = f_csv->GetParameter(2);
     c_csv->Modified();
